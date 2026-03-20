@@ -17,13 +17,17 @@ public class AppointmentDAOImpl implements AppointmentDAO {
 
     @Override
     public boolean addAppointment(Appointment appointment){
-        String sql = "INSERT INTO tblappointments (appointment_date, appointment_time, is_approve) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO tblappointments (user_id, pet_id, service_id, appointment_date, appointment_time, is_approve) VALUES (?, ?, ?, ?, ?, ?)";
 
         try(Connection connection = DbConnection.connect();
             PreparedStatement prep = connection.prepareStatement(sql)){
-            prep.setDate(1, appointment.getAppointmentDate());
-            prep.setTime(2, appointment.getAppointmentTime());
-            prep.setInt(3, appointment.getIsApprove());
+            prep.setInt(1, appointment.getUserID());
+            prep.setInt(2, appointment.getPetID());
+            prep.setInt(3, appointment.getServiceID());
+            prep.setDate(4, appointment.getAppointmentDate());
+            prep.setTime(5, appointment.getAppointmentTime());
+
+            prep.setInt(6, appointment.getIsApprove());
 
             return prep.executeUpdate() > 0;
         } catch (Exception e){
@@ -45,6 +49,9 @@ public class AppointmentDAOImpl implements AppointmentDAO {
                 Appointment appointment = new Appointment();
 
                 appointment.setAppointmentID(rs.getInt("appointment_id"));
+                appointment.setUserID(rs.getInt("user_id"));
+                appointment.setPetID(rs.getInt("pet_id"));
+                appointment.setServiceId(rs.getInt("service_id"));
                 appointment.setAppointmentDate(rs.getDate("appointment_date"));
                 appointment.setAppointmentTime(rs.getTime("appointment_time"));
                 appointment.setIsApprove(rs.getInt("is_approve"));
