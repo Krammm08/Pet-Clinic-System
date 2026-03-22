@@ -1,11 +1,15 @@
-
 package com.app.service;
 
 import com.app.model.User;
+import java.util.List;
 
 public interface UserService {
+    boolean addUser(User user);
+    List<User> getAllUsers();
+    User getUserById(int userId);
+    boolean updateUser(User user);
+    boolean deleteUser(int userId);
 
-    User login(String username, String password);
-
-    boolean register(User user);
+    // NEW: Service login method
+    User loginUser(String username, String password);
 }
