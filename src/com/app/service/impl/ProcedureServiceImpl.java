@@ -9,50 +9,40 @@ import java.util.List;
 
 public class ProcedureServiceImpl implements ProcedureService {
 
-    // The Service owns a copy of the DAO to talk to the database
     private ProcedureDAO procedureDAO = new ProcedureDAOImpl();
 
     @Override
     public boolean addProcedure(Procedure procedure) {
-        // BUSINESS LOGIC & VALIDATION
-
-        // Rule 1: Must be linked to a valid Appointment
         if (procedure.getAppointmentId() <= 0) {
             System.out.println("Validation Error: Procedure must be linked to a valid Appointment ID.");
             return false;
         }
 
-        // Rule 2: Must be linked to a valid Service (e.g., Checkup, Surgery)
         if (procedure.getServiceId() <= 0) {
             System.out.println("Validation Error: Procedure must be linked to a valid Service ID.");
             return false;
         }
 
-        // Rule 3: Must record which Vet performed it
         if (procedure.getVetId() <= 0) {
             System.out.println("Validation Error: A valid Vet ID is required.");
             return false;
         }
 
-        // Rule 4: Must link to the Owner and the Pet
         if (procedure.getUserId() <= 0 || procedure.getPetId() <= 0) {
             System.out.println("Validation Error: Both User ID and Pet ID are required.");
             return false;
         }
 
-        // Rule 5: The Vet must write a diagnosis/notes
         if (procedure.getDiagnosis() == null || procedure.getDiagnosis().trim().isEmpty()) {
             System.out.println("Validation Error: Diagnosis cannot be blank. The Vet must provide notes.");
             return false;
         }
 
-        // Rule 6: Medicine ID check (Assuming 0 means "No medicine prescribed", but negative is invalid)
         if (procedure.getMedicineId() < 0) {
             System.out.println("Validation Error: Medicine ID cannot be negative.");
             return false;
         }
 
-        // If all rules pass, tell the DAO to execute the SQL INSERT!
         return procedureDAO.addProcedure(procedure);
     }
 
@@ -72,13 +62,11 @@ public class ProcedureServiceImpl implements ProcedureService {
 
     @Override
     public boolean updateProcedure(Procedure procedure) {
-        // Validation: We need a valid ID to update the correct row
         if (procedure.getProcedureId() <= 0) {
             System.out.println("Validation Error: Cannot update. Invalid Procedure ID.");
             return false;
         }
 
-        // Re-run the diagnosis validation so they don't accidentally update it to be blank
         if (procedure.getDiagnosis() == null || procedure.getDiagnosis().trim().isEmpty()) {
             System.out.println("Validation Error: Diagnosis cannot be updated to blank.");
             return false;
@@ -89,7 +77,6 @@ public class ProcedureServiceImpl implements ProcedureService {
 
     @Override
     public boolean deleteProcedure(int procedureId) {
-        // Validation: Prevent accidental deletions
         if (procedureId <= 0) {
             System.out.println("Validation Error: Invalid Procedure ID provided for deletion.");
             return false;

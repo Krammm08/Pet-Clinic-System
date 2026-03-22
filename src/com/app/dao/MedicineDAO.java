@@ -3,7 +3,7 @@ import com.app.model.Medicine;
 import java.util.List;
 
 public interface MedicineDAO {
-    boolean addmedicine(Medicine medicine);
+    boolean addMedicine(Medicine medicine);
     List<Medicine> getAllMedicines();
     Medicine getMedicineById(int id);
     boolean updateMedicine(Medicine medicine);

@@ -13,7 +13,7 @@ import java.util.List;
 public class MedicineDAOImpl implements MedicineDAO{
 
     @Override
-    public boolean addmedicine(Medicine medicine){
+    public boolean addMedicine(Medicine medicine){
         String sql = "INSERT INTO tblmedicines (med_name, cost, inventory_count) VALUES (?, ?, ?)";
 
         try(Connection connection = DbConnection.connect();
