@@ -29,12 +29,3 @@ public class User {
 
   
 }
-
-
-/*
-    UserDTO customer = new UserDTO("maria", "1234", "CUSTOMER");
-    UserDTO admin = new UserDTO("admin", "admin123", "ADMIN");
-
-    System.out.println(customer.getRole()); // CUSTOMER
-    System.out.println(admin.getRole());    // ADMIN
-*/

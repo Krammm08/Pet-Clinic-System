@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.app.service;
 
-/**
- *
- * @author Mathet
- */
-public class TransactionService {
-    
+import com.app.model.Transaction;
+import java.util.List;
+
+public interface TransactionService {
+    boolean addtransaction(Transaction transaction);
+    List<Transaction> getAllTransactions();
+    Transaction getTransactionById(int id);
+    boolean updateTransaction(Transaction transaction);
+    boolean deleteTransaction(int id);
 }

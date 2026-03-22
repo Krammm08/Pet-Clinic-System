@@ -9,6 +9,6 @@ package com.app.dao.impl;
  *
  * @author Mathet
  */
-public class ServiceDAOImpl {
+public class OfferedServiceDAOImpl {
     
 }
