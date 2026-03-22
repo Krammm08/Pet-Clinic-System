@@ -1,10 +1,7 @@
 package com.app.dao.impl;
 
 import com.app.dao.AppointmentDAO;
-
-import com.app.dao.AppointmentDAO;
 import com.app.model.Appointment;
-import com.app.model.Medicine;
 import com.app.util.DbConnection;
 
 import java.sql.Connection;
