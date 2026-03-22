@@ -1,9 +1,9 @@
-package com.app.dao;
+package com.app.service;
 
 import com.app.model.Vet;
 import java.util.List;
 
-public interface VetDAO {
+public interface VetService {
     boolean addVet(Vet vet);
     List<Vet> getAllVets();
     Vet getVetById(int vetId);
