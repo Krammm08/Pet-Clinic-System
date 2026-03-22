@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TransactionDAOImpl implements TransactionDAO{
     @Override
-    public boolean addtransaction(Transaction transaction){
+    public boolean addTransaction(Transaction transaction){
         String sql = "INSERT INTO tbltransactions (transaction_id, process_id, user_id, service_id, medicine_id, quantity, total_amount, is_paid, transaction_datetime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try(Connection connection = DbConnection.connect();

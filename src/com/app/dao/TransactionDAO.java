@@ -4,7 +4,7 @@ import com.app.model.Transaction;
 import java.util.List;
 
 public interface TransactionDAO {
-    boolean addtransaction(Transaction transaction);
+    boolean addTransaction(Transaction transaction);
     List<Transaction> getAllTransactions();
     Transaction getTransactionById(int id);
     boolean updateTransaction(Transaction transaction);
