@@ -39,30 +39,26 @@ public class UserView {
     }
     
     private void viewAllUsers() {
-        try {
-            List<User> list = userDAO.getAllUsers();
+        List<User> list = userDAO.getAllUsers();
 
-            System.out.println("\n\t================ ALL USERS ===============");
+        System.out.println("\n\t================ ALL USERS ===============");
 
-            if (list.isEmpty()) {
-                System.out.println("No users found.");
-                return;
-            }
-
-            for (User user : list) {
-                System.out.println("User ID: " + user.getUserId());
-                System.out.println("Username: " + user.getUsername());
-                System.out.println("Full Name: " + user.getFirstName() + " " + user.getLastName());
-                System.out.println("Age: " + user.getAge());
-                System.out.println("Gender: " + user.getGender());
-                System.out.println("Contact Number: " + user.getContactNumber());
-                System.out.println("Email Address: " + user.getEmailAddress());
-                System.out.println("City Address: " + user.getCityAddress());
-                System.out.println("--------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        if (list.isEmpty()) {
+            System.out.println("No users found.");
+            return;
         }
+
+        for (User user : list) {
+            System.out.println("User ID: " + user.getUserId());
+            System.out.println("Username: " + user.getUsername());
+            System.out.println("Full Name: " + user.getFirstName() + " " + user.getLastName());
+            System.out.println("Age: " + user.getAge());
+            System.out.println("Gender: " + user.getGender());
+            System.out.println("Contact Number: " + user.getContactNumber());
+            System.out.println("Email Address: " + user.getEmailAddress());
+            System.out.println("City Address: " + user.getCityAddress());
+            System.out.println("--------------------------");
+        }
+
     }
 }

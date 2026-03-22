@@ -40,25 +40,21 @@ public class OfferedServiceView {
     }
     
     private void viewAllVets() {
-        try {
-            List<OfferedService> list = OfferedServiceDAO.getAllOptions();
+        List<OfferedService> list = OfferedServiceDAO.getAllServices();
 
-            System.out.println("\n\t========== ALL OFFERED SERVICES ==========");
+        System.out.println("\n\t========== ALL OFFERED SERVICES ==========");
 
-            if (list.isEmpty()) {
-                System.out.println("No care options found.");
-                return;
-            }
-
-            for (OfferedService option : list) {
-                System.out.println("Offered Service ID: " + option.getServiceId());
-                System.out.println("Service Type: " + option.getServiceType());
-                System.out.println("Service Fee: " + option.getServiceFee());
-                System.out.println("--------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        if (list.isEmpty()) {
+            System.out.println("No care options found.");
+            return;
         }
+
+        for (OfferedService option : list) {
+            System.out.println("Offered Service ID: " + option.getServiceId());
+            System.out.println("Service Type: " + option.getServiceType());
+            System.out.println("Service Fee: " + option.getServiceFee());
+            System.out.println("--------------------------");
+        }
+
     }
 }

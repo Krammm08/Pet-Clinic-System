@@ -1,13 +1,13 @@
 package com.app.service;
 
 import com.app.model.Appointment;
-import com.app.exception.DatabaseException;
+import com.app.exception.DatabaseException; // Make sure this is imported!
 import java.util.List;
 
 public interface AppointmentService {
 
-    // Matches the new DAO methods exactly
-    boolean createAppointment(Appointment appointment) throws DatabaseException;
+    // The throws DatabaseException must be here to match the Implementation!
+    boolean addAppointment(Appointment appointment) throws DatabaseException;
 
     List<Appointment> getUserAppointments(int userId);
 
@@ -20,6 +20,4 @@ public interface AppointmentService {
     boolean approveAppointment(int appointmentId) throws DatabaseException;
 
     boolean declineAppointment(int appointmentId) throws DatabaseException;
-
-    boolean addAppointment(Appointment appt);
 }

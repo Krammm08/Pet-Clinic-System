@@ -1,5 +1,6 @@
 package com.app.view;
 
+import com.app.exception.DatabaseException;
 import com.app.model.User;
 import com.app.util.Asciiart;
 import com.app.util.InputUtil;
@@ -8,7 +9,7 @@ public class AdminMenu {
     
     private final Asciiart art = new Asciiart();
 
-    public void show(User user) {
+    public void show(User user) throws DatabaseException {
         while (true) {
             String dog = art.longDog();
             System.out.println(dog);

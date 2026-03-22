@@ -11,66 +11,67 @@ import java.util.List;
 
 public class AppointmentServiceImpl implements AppointmentService {
 
-    // Connect to your newly updated DAO
+    // Connect to your DAO
     private AppointmentDAO appointmentDAO = new AppointmentDAOImpl();
 
+    // 1. Matches the AppointmentService interface requirement!
     @Override
-    public boolean createAppointment(Appointment appointment) throws DatabaseException {
+    public boolean addAppointment(Appointment appointment) throws DatabaseException {
+
         // Validation Rules
         if (appointment.getUserID() <= 0) {
-            System.out.println("Validation Error: Appointment must be linked to a valid User ID.");
+            System.out.println("\tX Validation Error: Appointment must be linked to a valid User ID.");
             return false;
         }
 
         if (appointment.getPetID() <= 0) {
-            System.out.println("Validation Error: Appointment must be linked to a valid Pet ID.");
+            System.out.println("\tX Validation Error: Appointment must be linked to a valid Pet ID.");
             return false;
         }
 
         if (appointment.getServiceID() <= 0) {
-            System.out.println("Validation Error: A valid Service ID must be selected.");
+            System.out.println("\tX Validation Error: A valid Service ID must be selected.");
             return false;
         }
 
         if (appointment.getAppointmentDate() == null) {
-            System.out.println("Validation Error: Appointment date cannot be empty.");
+            System.out.println("\tX Validation Error: Appointment date cannot be empty.");
             return false;
         }
 
         if (appointment.getAppointmentTime() == null) {
-            System.out.println("Validation Error: Appointment time cannot be empty.");
+            System.out.println("\tX Validation Error: Appointment time cannot be empty.");
             return false;
         }
 
-        // If all validations pass, send it to the database
+        // 2. Matches your actual AppointmentDAO method name!
         return appointmentDAO.insertAppointment(appointment);
     }
 
     @Override
     public List<Appointment> getUserAppointments(int userId) {
-        if (userId <= 0) return new ArrayList<>(); // basic validation
+        if (userId <= 0) return new ArrayList<>();
         return appointmentDAO.getUserAppointments(userId);
     }
 
     @Override
     public List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException {
         if (userId <= 0) {
-            System.out.println("Validation Error: Invalid User ID.");
-            return new ArrayList<>(); // Return an empty list to prevent crashing
+            System.out.println("\tX Validation Error: Invalid User ID.");
+            return new ArrayList<>();
         }
         return appointmentDAO.getAppointmentsByUserId(userId);
     }
 
     @Override
     public List<Appointment> getAllAppointments() throws DatabaseException {
-        // No strict validation needed for admins to view the full list
         return appointmentDAO.getAllAppointments();
     }
 
     @Override
     public Appointment getAppointmentById(int appointmentId) throws DatabaseException {
         if (appointmentId <= 0) {
-            System.out.println("Validation Error: Invalid Appointment ID.");
+            System.out.println("\tX Validation Error: Invalid Appointment ID.");
             return null;
         }
         return appointmentDAO.getAppointmentById(appointmentId);
@@ -79,7 +80,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public boolean approveAppointment(int appointmentId) throws DatabaseException {
         if (appointmentId <= 0) {
-            System.out.println("Validation Error: Invalid Appointment ID provided for approval.");
+            System.out.println("\tX Validation Error: Invalid Appointment ID provided for approval.");
             return false;
         }
         return appointmentDAO.approveAppointment(appointmentId);
@@ -88,7 +89,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public boolean declineAppointment(int appointmentId) throws DatabaseException {
         if (appointmentId <= 0) {
-            System.out.println("Validation Error: Invalid Appointment ID provided for decline.");
+            System.out.println("\tX Validation Error: Invalid Appointment ID provided for decline.");
             return false;
         }
         return appointmentDAO.declineAppointment(appointmentId);
