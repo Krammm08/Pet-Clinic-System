@@ -17,7 +17,7 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         String sqlApp = "INSERT INTO tblappointments (pet_id, service_id, user_id, appointment_date, appointment_time, is_approve) VALUES (?, ?, ?, ?, ?, 0)";
 
         // SQL 2: The Medical Link (Using Vet #1 and Medicine #0 placeholders)
-        String sqlProc = "INSERT INTO tblprocedures (appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id, procedure_date) VALUES (?, ?, 1, ?, ?, 'Pending Exam', 0, ?)";
+        String sqlProc = "INSERT INTO tblprocedures (appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id, procedure_date) VALUES (?, ?, 1, ?, ?, 'Pending Exam', 1, ?)";
 
         // SQL 3: The Bill (Automatically set to 'is_paid = 0')
         String sqlTrans = "INSERT INTO tbltransactions (user_id, service_id, procedure_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, 0, 1, ?, 0)";
