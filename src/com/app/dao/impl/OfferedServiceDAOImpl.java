@@ -2,7 +2,7 @@ package com.app.dao.impl;
 
 import com.app.dao.OfferedServiceDAO;
 import com.app.model.OfferedService;
-import com.app.util.DbConnection;
+import com.app.util.DbConnection; // Using your updated connection utility!
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,14 +14,14 @@ public class OfferedServiceDAOImpl implements OfferedServiceDAO {
 
     @Override
     public boolean addService(OfferedService service) {
-        String sql = "INSERT INTO tblservices (service_name, description, service_fee) VALUES (?, ?, ?)";
+        // Skipping service_id so MySQL can auto-increment it
+        String sql = "INSERT INTO tblservices (service_type, service_fee) VALUES (?, ?)";
 
         try (Connection conn = DbConnection.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, service.getServiceName());
-            ps.setString(2, service.getDescription());
-            ps.setInt(3, service.getServiceFee());
+            ps.setString(1, service.getServiceType());
+            ps.setDouble(2, service.getServiceFee()); // Now uses setDouble!
 
             return ps.executeUpdate() > 0;
 
@@ -44,9 +44,8 @@ public class OfferedServiceDAOImpl implements OfferedServiceDAO {
                 OfferedService service = new OfferedService();
 
                 service.setServiceId(rs.getInt("service_id"));
-                service.setServiceName(rs.getString("service_name"));
-                service.setDescription(rs.getString("description"));
-                service.setServiceFee(rs.getInt("service_fee"));
+                service.setServiceType(rs.getString("service_type"));
+                service.setServiceFee(rs.getDouble("service_fee")); // Now reads as a double
 
                 serviceList.add(service);
             }

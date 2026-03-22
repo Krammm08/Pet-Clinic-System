@@ -9,23 +9,20 @@ import java.util.List;
 
 public class OfferedServiceServiceImpl implements OfferedServiceService {
 
-    // The Service owns a copy of the DAO to talk to the database
     private OfferedServiceDAO serviceDAO = new OfferedServiceDAOImpl();
 
     @Override
     public boolean addService(OfferedService service) {
-        if (service.getServiceName() == null || service.getServiceName().trim().isEmpty()) {
-            System.out.println("Validation Error: Service name cannot be blank.");
+        // Validation 1: Service Type cannot be blank
+        if (service.getServiceType() == null || service.getServiceType().trim().isEmpty()) {
+            System.out.println("Validation Error: Service type cannot be blank.");
             return false;
         }
 
-        if (service.getServiceFee() < 0) {
+        // Validation 2: Service Fee cannot be negative (0.0 is fine for free services)
+        if (service.getServiceFee() < 0.0) {
             System.out.println("Validation Error: Service fee cannot be negative.");
             return false;
-        }
-
-        if (service.getDescription() == null || service.getDescription().trim().isEmpty()) {
-            System.out.println("Validation Warning: Description is blank, but we will allow it.");
         }
 
         return serviceDAO.addService(service);
@@ -52,12 +49,12 @@ public class OfferedServiceServiceImpl implements OfferedServiceService {
             return false;
         }
 
-        if (service.getServiceName() == null || service.getServiceName().trim().isEmpty()) {
-            System.out.println("Validation Error: Service name cannot be updated to blank.");
+        if (service.getServiceType() == null || service.getServiceType().trim().isEmpty()) {
+            System.out.println("Validation Error: Service type cannot be updated to blank.");
             return false;
         }
 
-        if (service.getServiceFee() < 0) {
+        if (service.getServiceFee() < 0.0) {
             System.out.println("Validation Error: Service fee cannot be updated to a negative number.");
             return false;
         }

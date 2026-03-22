@@ -3,37 +3,43 @@ package com.app.model;
 public class OfferedService {
 
     private int serviceId;
-    private String serviceName;
-    private String description;
-    private int serviceFee;
+    private String serviceType;
+    private double serviceFee;
 
-    public OfferedService() {}
+    // Default Constructor
+    public OfferedService() {
+    }
+
+    // Full Constructor
+    public OfferedService(int serviceId, String serviceType, double serviceFee) {
+        this.serviceId = serviceId;
+        this.serviceType = serviceType;
+        this.serviceFee = serviceFee;
+    }
+
+    // Getters and Setters
 
     public int getServiceId() {
         return serviceId;
     }
+
     public void setServiceId(int serviceId) {
         this.serviceId = serviceId;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public String getServiceType() {
+        return serviceType;
     }
 
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
-    public int getServiceFee() {
+    public double getServiceFee() {
         return serviceFee;
     }
-    public void setServiceFee(int serviceFee) {
+
+    public void setServiceFee(double serviceFee) {
         this.serviceFee = serviceFee;
     }
 }
