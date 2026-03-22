@@ -2,7 +2,7 @@ package com.app.dao.impl;
 
 import com.app.dao.ProcedureDAO;
 import com.app.model.Procedure;
-import com.app.util.DbConnection;
+import com.app.util.DbConnection; // Using your connection utility
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,30 +14,30 @@ public class ProcedureDAOImpl implements ProcedureDAO {
 
     @Override
     public boolean addProcedure(Procedure procedure) {
-        String sql = "INSERT INTO tblprocedures (procedure_id, appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id, procedure_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // We skip procedure_id (auto-increment) and procedure_date (usually auto-timestamped by the database)
+        String sql = "INSERT INTO tblprocedures (appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection connection = DbConnection.connect();
-            PreparedStatement prep = connection.prepareStatement(sql)){
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            prep.setInt(1, procedure.getAppointmentId());
-            prep.setInt(2, procedure.getServiceId());
-            prep.setInt(3, procedure.getServiceId());
-            prep.setInt(4, procedure.getUserId());
-            prep.setInt(5, procedure.getPetId());
-            prep.setString(6, procedure.getDiagnosis());
+            ps.setInt(1, procedure.getAppointmentId());
+            ps.setInt(2, procedure.getServiceId());
+            ps.setInt(3, procedure.getVetId());
+            ps.setInt(4, procedure.getUserId());
+            ps.setInt(5, procedure.getPetId());
+            ps.setString(6, procedure.getDiagnosis());
+            ps.setInt(7, procedure.getMedicineId());
 
-            prep.setInt(7, procedure.getMedicineId());
+            return ps.executeUpdate() > 0;
 
-            return prep.executeUpdate() > 0;
-
-        } catch (Exception e){
-            System.out.println("Error adding medicine: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error adding procedure: " + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public List<Procedure> getAllProcedure() {
+    public List<Procedure> getAllProcedures() {
         List<Procedure> procedureList = new ArrayList<>();
         String sql = "SELECT * FROM tblprocedures";
 
@@ -48,7 +48,6 @@ public class ProcedureDAOImpl implements ProcedureDAO {
             while (rs.next()) {
                 Procedure procedure = new Procedure();
 
-                // Retrieving all data from the database
                 procedure.setProcedureId(rs.getInt("procedure_id"));
                 procedure.setAppointmentId(rs.getInt("appointment_id"));
                 procedure.setServiceId(rs.getInt("service_id"));
@@ -57,28 +56,30 @@ public class ProcedureDAOImpl implements ProcedureDAO {
                 procedure.setPetId(rs.getInt("pet_id"));
                 procedure.setDiagnosis(rs.getString("diagnosis"));
                 procedure.setMedicineId(rs.getInt("medicine_id"));
-                procedure.setProcedureDate(rs.getDate("procedure_date"));
+
+                // Read the date from the database as a String
+                procedure.setProcedureDate(rs.getString("procedure_date"));
 
                 procedureList.add(procedure);
             }
         } catch (Exception e) {
-            System.out.println("Error retrieving procedure records: " + e.getMessage());
+            System.out.println("Error retrieving procedures: " + e.getMessage());
         }
         return procedureList;
     }
 
     @Override
     public Procedure getProcedureById(int procedureId) {
-        return null;
+        return null; // TODO: Implement later
     }
 
     @Override
     public boolean updateProcedure(Procedure procedure) {
-        return false;
+        return false; // TODO: Implement later
     }
 
     @Override
-    public boolean deleteProcedure(int id) {
-        return false;
+    public boolean deleteProcedure(int procedureId) {
+        return false; // TODO: Implement later
     }
 }
