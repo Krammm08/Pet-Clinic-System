@@ -30,7 +30,7 @@ public class Procedure {
     
     // GETTER & SETTER
     
-    public int getprocedureId(){
+    public int getProcedureId(){
         return procedureId;
     }
     
