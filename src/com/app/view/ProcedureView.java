@@ -1,7 +1,5 @@
 package com.app.view;
 
-import com.app.exception.DatabaseException;
-import com.app.exception.ValidationException;
 import com.app.model.Procedure;
 import com.app.service.ProcedureService;
 import com.app.service.impl.ProcedureServiceImpl;
@@ -19,7 +17,6 @@ public class ProcedureView {
     public void show() {
 
         while (true) {
-            
             System.out.println("\n\t========== PROCEDURE MANAGEMENT ==========");
             System.out.println("\t|\t1. Create Procedure");
             System.out.println("\t|\t2. View All Procedures");
@@ -27,82 +24,71 @@ public class ProcedureView {
             System.out.println("\t==========================================");
             int choice = InputUtil.getInt("\tChoose option: ");
             System.out.println("\t==========================================\n");
-            switch (choice) {
 
+            switch (choice) {
                 case 1:
                     createProcedure();
                     break;
-
                 case 2:
                     viewProcedures();
                     break;
-
                 case 3:
                     return;
-
                 default:
-                    System.out.println("Invalid choice.");
+                    System.out.println("\tX Invalid choice.");
             }
         }
     }
 
-    // CREATE PROCEdure
+    // CREATE PROCEDURE
     private void createProcedure() {
-        try {
-            Procedure p = new Procedure();
+        Procedure p = new Procedure();
 
-            p.setAppointmentId(InputUtil.getInt("Appointment ID: "));
-            p.setUserId(InputUtil.getInt("User ID: "));
-            p.setPetId(InputUtil.getInt("Pet ID: "));
-            p.setVetId(InputUtil.getInt("Vet ID: "));
-            p.setServiceId(InputUtil.getInt("Service ID: "));
-            p.setMedicineId(InputUtil.getInt("Medicine ID: "));
-            p.setDiagnosis(InputUtil.getNonEmptyString("Diagnosis: "));
-            p.setProcedureDate(LocalDate.now().toString());
+        p.setAppointmentId(InputUtil.getInt("\tAppointment ID: "));
+        p.setUserId(InputUtil.getInt("\tUser ID (Owner): "));
+        p.setPetId(InputUtil.getInt("\tPet ID: "));
+        p.setVetId(InputUtil.getInt("\tVet ID: "));
+        p.setServiceId(InputUtil.getInt("\tService ID: "));
+        p.setMedicineId(InputUtil.getInt("\tMedicine ID (0 if none): "));
+        p.setDiagnosis(InputUtil.getNonEmptyString("\tDiagnosis: "));
 
-            boolean success = procedureService.createProcedure(p);
+        // Setting today's date automatically
+        p.setProcedureDate(LocalDate.now().toString());
 
-            if (success) {
-                System.out.println("Procedure created successfully!");
-                System.out.println("Transaction automatically generated.");
-            } else {
-                System.out.println("Failed to create procedure.");
-            }
+        // FIXED: Changed createProcedure to addProcedure to match the Service!
+        boolean success = procedureService.addProcedure(p);
 
-        } catch (ValidationException e) {
-            System.out.println("X " + e.getMessage());
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        if (success) {
+            System.out.println("\t-> Procedure created successfully!");
+            System.out.println("\t-> Transaction automatically generated."); // Note: Make sure your DB triggers handle this, or add logic to do it!
+        } else {
+            System.out.println("\tX Failed to create procedure. Please check your inputs.");
         }
     }
 
-    // VIEW ALL PROCEdureES
+    // VIEW ALL PROCEDURES
     private void viewProcedures() {
-        try {
-            List<Procedure> list = procedureService.getAllProcedures();
+        // No try-catch needed here because the DAO handles errors internally!
+        List<Procedure> list = procedureService.getAllProcedures();
 
-            System.out.println("\n===== ALL PROCEDURES =====");
+        System.out.println("\n\t===== ALL PROCEDURES =====");
 
-            if (list.isEmpty()) {
-                System.out.println("No procedures found.");
-                return;
-            }
+        if (list.isEmpty()) {
+            System.out.println("\tNo procedures found.");
+            return;
+        }
 
-            for (Procedure p : list) {
-                System.out.println("Procedure ID: " + p.getProcedureId());
-                System.out.println("Appointment ID: " + p.getAppointmentId());
-                System.out.println("User ID: " + p.getUserId());
-                System.out.println("Pet ID: " + p.getPetId());
-                System.out.println("Vet ID: " + p.getVetId());
-                System.out.println("Service ID: " + p.getServiceId());
-                System.out.println("Medicine ID: " + p.getMedicineId());
-                System.out.println("Diagnosis: " + p.getDiagnosis());
-                System.out.println("Date: " + p.getProcedureDate());
-                System.out.println("---------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        for (Procedure p : list) {
+            System.out.println("\tProcedure ID: " + p.getProcedureId());
+            System.out.println("\tAppointment ID: " + p.getAppointmentId());
+            System.out.println("\tUser ID: " + p.getUserId());
+            System.out.println("\tPet ID: " + p.getPetId());
+            System.out.println("\tVet ID: " + p.getVetId());
+            System.out.println("\tService ID: " + p.getServiceId());
+            System.out.println("\tMedicine ID: " + p.getMedicineId());
+            System.out.println("\tDiagnosis: " + p.getDiagnosis());
+            System.out.println("\tDate: " + p.getProcedureDate());
+            System.out.println("\t---------------------------");
         }
     }
 }

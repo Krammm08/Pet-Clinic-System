@@ -47,6 +47,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    public List<Appointment> getUserAppointments(int userId) {
+        if (userId <= 0) return new ArrayList<>(); // basic validation
+        return appointmentDAO.getUserAppointments(userId);
+    }
+
+    @Override
     public List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException {
         if (userId <= 0) {
             System.out.println("Validation Error: Invalid User ID.");

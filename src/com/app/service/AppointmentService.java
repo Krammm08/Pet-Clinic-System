@@ -9,6 +9,8 @@ public interface AppointmentService {
     // Matches the new DAO methods exactly
     boolean createAppointment(Appointment appointment) throws DatabaseException;
 
+    List<Appointment> getUserAppointments(int userId);
+
     List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException;
 
     List<Appointment> getAllAppointments() throws DatabaseException;

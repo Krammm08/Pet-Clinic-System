@@ -8,6 +8,7 @@ public interface AppointmentDAO {
 
     // Create appointment
     boolean insertAppointment(Appointment appointment) throws DatabaseException;
+    List<Appointment> getUserAppointments(int userId);
 
     // Get all appointments of a user
     List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException;

@@ -40,6 +40,35 @@ public class AppointmentDAOImpl implements AppointmentDAO {
     }
 
     @Override
+    public List<Appointment> getUserAppointments(int userId) {
+        List<Appointment> apptList = new ArrayList<>();
+        String sql = "SELECT * FROM tblappointments WHERE user_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Appointment appt = new Appointment();
+                    appt.setAppointmentID(rs.getInt("appointment_id"));
+                    appt.setUserID(rs.getInt("user_id"));
+                    appt.setPetID(rs.getInt("pet_id"));
+                    appt.setServiceId(rs.getInt("service_id"));
+                    appt.setAppointmentDate(rs.getDate("appointment_date"));
+                    appt.setAppointmentTime(rs.getTime("appointment_time"));
+                    appt.setIsApprove(rs.getInt("is_approve"));
+                    apptList.add(appt);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving user appointments: " + e.getMessage());
+        }
+        return apptList;
+    }
+
+    @Override
     public List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException {
         List<Appointment> appointmentList = new ArrayList<>();
         // Targeted query using WHERE clause
