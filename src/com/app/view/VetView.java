@@ -40,30 +40,26 @@ public class VetView {
     }
     
     private void viewAllVets() {
-        try {
-            List<Vet> list = vetDAO.getAllVets();
+        List<Vet> list = vetDAO.getAllVets();
 
-            System.out.println("\n\t================ ALL VETS ================");
+        System.out.println("\n\t================ ALL VETS ================");
 
-            if (list.isEmpty()) {
-                System.out.println("No vets found.");
-                return;
-            }
-
-            for (Vet vet : list) {
-                System.out.println("Vet ID: " + vet.getVetId());
-                System.out.println("Username: " + vet.getVetName());
-                System.out.println("Full Name: " + vet.getFirstName() + " " + vet.getLastName());
-                System.out.println("Age: " + vet.getAge());
-                System.out.println("Gender: " + vet.getGender());
-                System.out.println("Contact Number: " + vet.getContactNumber());
-                System.out.println("Email Address: " + vet.getEmailAddress());
-                System.out.println("Specialization: " + vet.getSpecialization());
-                System.out.println("--------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        if (list.isEmpty()) {
+            System.out.println("No vets found.");
+            return;
         }
+
+        for (Vet vet : list) {
+            System.out.println("Vet ID: " + vet.getVetId());
+            System.out.println("Username: " + vet.getVetName());
+            System.out.println("Full Name: " + vet.getFirstName() + " " + vet.getLastName());
+            System.out.println("Age: " + vet.getAge());
+            System.out.println("Gender: " + vet.getGender());
+            System.out.println("Contact Number: " + vet.getContactNumber());
+            System.out.println("Email Address: " + vet.getEmailAddress());
+            System.out.println("Specialization: " + vet.getSpecialization());
+            System.out.println("--------------------------");
+        }
+
     }
 }

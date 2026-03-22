@@ -1,23 +1,18 @@
-package com.app.main;
-
 import com.app.model.User;
 import com.app.view.LoginView;
+import com.app.view.MainMenuView;
 
-public class Main {
-    public static void main(String[] args) {
-        LoginView loginView = new LoginView();
-        User loggedInUser = null;
 
-        // Keep asking them to log in until they get it right
-        while (loggedInUser == null) {
-            loggedInUser = loginView.login();
-        }
+public static void main(String[] args) {
+    LoginView loginView = new LoginView();
+    MainMenuView mainMenuView = new MainMenuView();
 
-        System.out.println("\n--- MAIN MENU ---");
-        if (loggedInUser.isAdmin()) {
-            System.out.println("Loading Admin Dashboard...");
-        } else if (loggedInUser.isCustomer()) {
-            System.out.println("Loading Customer Portal...");
+    while (true) {
+        User loggedInUser = loginView.login();
+
+        if (loggedInUser != null) {
+            // This starts the dashboard loop
+            mainMenuView.showMenu(loggedInUser);
         }
     }
 }
