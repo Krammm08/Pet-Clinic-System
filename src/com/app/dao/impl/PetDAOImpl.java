@@ -15,7 +15,7 @@ public class PetDAOImpl implements PetDAO {
     @Override
     public boolean addPet(Pet pet) {
         // Skipping pet_id because MySQL auto-increments it
-        String sql = "INSERT INTO tblpets (pet_name, animal_type, breed, age, gender, weight_kg, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tblpets (pet_name, animal_type, breed, age, gender, weights_kg, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbConnection.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -55,7 +55,7 @@ public class PetDAOImpl implements PetDAO {
                     pet.setBreed(rs.getString("breed"));
                     pet.setAge(rs.getInt("age"));
                     pet.setGender(rs.getString("gender"));
-                    pet.setWeightKg(rs.getInt("weight_kg"));
+                    pet.setWeightKg(rs.getInt("weights_kg"));
                     pet.setUserId(rs.getInt("user_id"));
                     petList.add(pet);
                 }
@@ -84,7 +84,7 @@ public class PetDAOImpl implements PetDAO {
                 pet.setBreed(rs.getString("breed"));
                 pet.setAge(rs.getInt("age"));
                 pet.setGender(rs.getString("gender"));
-                pet.setWeightKg(rs.getInt("weight_kg"));
+                pet.setWeightKg(rs.getInt("weights_kg"));
                 pet.setUserId(rs.getInt("user_id"));
 
                 petList.add(pet);

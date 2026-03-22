@@ -1,9 +1,10 @@
+import com.app.exception.DatabaseException;
 import com.app.model.User;
 import com.app.view.LoginView;
 import com.app.view.MainMenuView;
 
 
-public static void main(String[] args) {
+public static void main(String[] args) throws DatabaseException {
     LoginView loginView = new LoginView();
     MainMenuView mainMenuView = new MainMenuView();
 
