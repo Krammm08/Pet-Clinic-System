@@ -1,22 +1,55 @@
 package com.app.model;
 
 public class Medicine {
-    private int medicineID;
+
+    private int medicineId;
     private String medName;
     private int cost;
     private int inventoryCount;
 
-    public Medicine(){}
+    // Default Constructor
+    public Medicine() {
+    }
 
-    public int getMedicineID(){return medicineID;}
-    public void setMedicineID(int medicineID){this.medicineID = medicineID;}
+    // Full Constructor
+    public Medicine(int medicineId, String medName, int cost, int inventoryCount) {
+        this.medicineId = medicineId;
+        this.medName = medName;
+        this.cost = cost;
+        this.inventoryCount = inventoryCount;
+    }
 
-    public String getMedName(){return medName;}
-    public void setMedName(String medName){this.medName = medName;}
+    // Getters and Setters
 
-    public int getCost(){return cost;}
-    public void setCost(int cost){this.cost = cost;}
+    public int getMedicineId() {
+        return medicineId;
+    }
 
-    public int getInventoryCount(){return inventoryCount;}
-    public void setInventoryCount(int inventoryCount){this.inventoryCount = inventoryCount;}
+    public void setMedicineId(int medicineId) {
+        this.medicineId = medicineId;
+    }
+
+    public String getMedName() {
+        return medName;
+    }
+
+    public void setMedName(String medName) {
+        this.medName = medName;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
+    public int getInventoryCount() {
+        return inventoryCount;
+    }
+
+    public void setInventoryCount(int inventoryCount) {
+        this.inventoryCount = inventoryCount;
+    }
 }
