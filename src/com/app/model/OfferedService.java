@@ -1,6 +1,6 @@
 package com.app.model;
 
-public class OfferedService{
+public class OfferedService {
 
     private int serviceId;
     private String serviceName;
