@@ -1,13 +1,13 @@
 package com.app.dao;
 
+import com.app.exception.DatabaseException;
 import com.app.model.Procedure;
 
 import java.util.List;
 
 public interface ProcedureDAO {
-    boolean addProcedure(Procedure procedure);
-    List<Procedure> getAllProcedure();
-    Procedure getProcedureById(int id);
-    boolean updateProcedure(Procedure procedure);
+    boolean insertProcedure(Procedure procedure) throws DatabaseException;
+    List<Procedure> getAllProcedures() throws DatabaseException;
+    Procedure getProcedureById(int procedureId) throws DatabaseException;    boolean updateProcedure(Procedure procedure);
     boolean deleteProcedure(int id);
 }

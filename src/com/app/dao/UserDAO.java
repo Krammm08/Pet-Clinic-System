@@ -1,23 +1,26 @@
-
 package com.app.dao;
 
-import com.app.model.User;
 import java.util.List;
+import com.app.model.User;
+import com.app.exception.DatabaseException;
 
 public interface UserDAO {
-    
-     // CREATE
-    void addUser(User user);
 
-    // READ (single)
-    User getUserById(int id);
+    // Create Account (Register)
+    boolean insertUser(User user) throws DatabaseException;
 
-    // READ (all)
-    List<User> getAllUsers();
+    // Login
+    User getUserByUsername(String username) throws DatabaseException;
 
-    // UPDATE
-    void updateUser(User user);
+    // Get All Users (Admin use)
+    List<User> getAllUsers() throws DatabaseException;
 
-    // DELETE
-    void deleteUser(int id);
+    // Get User by ID
+    User getUserById(int userId) throws DatabaseException;
+
+    // Update User
+    boolean updateUser(User user) throws DatabaseException;
+
+    // Delete User
+    boolean deleteUser(int userId) throws DatabaseException;
 }

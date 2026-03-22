@@ -4,15 +4,19 @@ import com.app.dao.AppointmentDAO;
 import com.app.dao.impl.AppointmentDAOImpl;
 import com.app.model.Appointment;
 import com.app.service.AppointmentService;
+import com.app.exception.DatabaseException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentServiceImpl implements AppointmentService {
 
+    // Connect to your newly updated DAO
     private AppointmentDAO appointmentDAO = new AppointmentDAOImpl();
 
     @Override
-    public boolean addAppointment(Appointment appointment) {
+    public boolean createAppointment(Appointment appointment) throws DatabaseException {
+        // Validation Rules
         if (appointment.getUserID() <= 0) {
             System.out.println("Validation Error: Appointment must be linked to a valid User ID.");
             return false;
@@ -38,45 +42,49 @@ public class AppointmentServiceImpl implements AppointmentService {
             return false;
         }
 
-        return appointmentDAO.addAppointment(appointment);
+        // If all validations pass, send it to the database
+        return appointmentDAO.insertAppointment(appointment);
     }
 
     @Override
-    public List<Appointment> getAllAppointments() {
+    public List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException {
+        if (userId <= 0) {
+            System.out.println("Validation Error: Invalid User ID.");
+            return new ArrayList<>(); // Return an empty list to prevent crashing
+        }
+        return appointmentDAO.getAppointmentsByUserId(userId);
+    }
+
+    @Override
+    public List<Appointment> getAllAppointments() throws DatabaseException {
+        // No strict validation needed for admins to view the full list
         return appointmentDAO.getAllAppointments();
     }
 
     @Override
-    public Appointment getAppointmentById(int appointmentID) {
-        if (appointmentID <= 0) {
+    public Appointment getAppointmentById(int appointmentId) throws DatabaseException {
+        if (appointmentId <= 0) {
             System.out.println("Validation Error: Invalid Appointment ID.");
             return null;
         }
-        return appointmentDAO.getAppointmentById(appointmentID);
+        return appointmentDAO.getAppointmentById(appointmentId);
     }
 
     @Override
-    public boolean updateAppointment(Appointment appointment) {
-        if (appointment.getAppointmentID() <= 0) {
-            System.out.println("Validation Error: Cannot update. Invalid Appointment ID.");
+    public boolean approveAppointment(int appointmentId) throws DatabaseException {
+        if (appointmentId <= 0) {
+            System.out.println("Validation Error: Invalid Appointment ID provided for approval.");
             return false;
         }
-
-        if (appointment.getAppointmentDate() == null || appointment.getAppointmentTime() == null) {
-            System.out.println("Validation Error: Date and Time cannot be empty.");
-            return false;
-        }
-
-        return appointmentDAO.updateAppointment(appointment);
+        return appointmentDAO.approveAppointment(appointmentId);
     }
 
     @Override
-    public boolean deleteAppointment(int appointmentID) {
-        if (appointmentID <= 0) {
-            System.out.println("Validation Error: Invalid Appointment ID provided for deletion.");
+    public boolean declineAppointment(int appointmentId) throws DatabaseException {
+        if (appointmentId <= 0) {
+            System.out.println("Validation Error: Invalid Appointment ID provided for decline.");
             return false;
         }
-
-        return appointmentDAO.deleteAppointment(appointmentID);
+        return appointmentDAO.declineAppointment(appointmentId);
     }
 }

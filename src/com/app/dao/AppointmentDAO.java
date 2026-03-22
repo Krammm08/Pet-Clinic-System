@@ -1,14 +1,26 @@
 package com.app.dao;
 
-import com.app.model.Appointment;
 import java.util.List;
+import com.app.model.Appointment;
+import com.app.exception.DatabaseException;
 
 public interface AppointmentDAO {
 
-    boolean addAppointment(Appointment appointment);
-    List<Appointment> getAllAppointments();
-    Appointment getAppointmentById(int appointmentId);
-    boolean updateAppointment(Appointment appointment);
-    boolean deleteAppointment(int appointmentId);
+    // Create appointment
+    boolean insertAppointment(Appointment appointment) throws DatabaseException;
 
+    // Get all appointments of a user
+    List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException;
+
+    // Get all appointments (Admin)
+    List<Appointment> getAllAppointments() throws DatabaseException;
+
+    // Get appointment by ID
+    Appointment getAppointmentById(int appointmentId) throws DatabaseException;
+
+    // Approve appointment
+    boolean approveAppointment(int appointmentId) throws DatabaseException;
+
+    // Decline appointment
+    boolean declineAppointment(int appointmentId) throws DatabaseException;
 }
