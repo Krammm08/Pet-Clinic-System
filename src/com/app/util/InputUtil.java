@@ -3,71 +3,33 @@ package com.app.util;
 import java.util.Scanner;
 
 public class InputUtil {
+    private static final Scanner scanner = new Scanner(System.in);
 
-    private static final Scanner SCAN = new Scanner(System.in);
-
-    public static int getInt(String message) {
-        int value;
-        while (true) {
-            try {
-                System.out.print(message);
-                value = Integer.parseInt(SCAN.nextLine());
-                return value;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
-        }
-    }
-
-    public static double getDouble(String message) {
-        double value;
-        while (true) {
-            try {
-                System.out.print(message);
-                value = Double.parseDouble(SCAN.nextLine());
-                return value;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-            }
-        }
-    }
-
-    public static String getString(String message) {
-        System.out.print(message);
-        return SCAN.nextLine().trim();
-    }
-
-    public static String getNonEmptyString(String message) {
+    public static String getNonEmptyString(String prompt) {
         String input;
-        while (true) {
-            System.out.print(message);
-            input = SCAN.nextLine().trim();
-
-            if (!input.isEmpty()) {
-                return input;
-            } else {
-                System.out.println("Input cannot be empty.");
+        do {
+            System.out.print(prompt);
+            input = scanner.nextLine().trim();
+            if (input.isEmpty()) {
+                System.out.println("\tX Input cannot be empty. Please try again.");
             }
-        }
+        } while (input.isEmpty());
+        return input;
     }
 
-    public static String getChoice(String message, String... options) {
-        String input;
-        while (true) {
-            System.out.print(message);
-            input = SCAN.nextLine().trim();
-
-            for (String option : options) {
-                if (input.equalsIgnoreCase(option)) {
-                    return input;
-                }
+    // NEW: Number reader that prevents crashes!
+    public static int getInt(String prompt) {
+        int input = -1;
+        boolean valid = false;
+        while (!valid) {
+            System.out.print(prompt);
+            try {
+                input = Integer.parseInt(scanner.nextLine().trim());
+                valid = true;
+            } catch (NumberFormatException e) {
+                System.out.println("\tX Invalid input. Please enter a valid number.");
             }
-
-            System.out.print("Invalid choice. Options: ");
-            for (String option : options) {
-                System.out.print(option + " ");
-            }
-            System.out.println();
         }
+        return input;
     }
 }

@@ -2,7 +2,7 @@ package com.app.main;
 
 //import exception.ValidationException;
 import java.sql.Connection;
-import com.app.util.DBConnection;
+import com.app.util.DbConnection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class TestConnection {
     public static void main(String[] args) {
         try {
-            Connection conn = DBConnection.getConnection();
+            Connection conn = DbConnection.connect();
             
             if (conn != null) {
                 System.out.println("Database Connected Successfully!");
