@@ -1,6 +1,5 @@
 package com.app.dao;
 
-import com.app.model.Medicine;
 import com.app.model.Procedure;
 
 import java.util.List;
