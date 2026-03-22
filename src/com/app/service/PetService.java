@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface PetService {
     boolean addPet(Pet pet);
+    List<Pet> getPetsByUser(int userId);
     List<Pet> getAllPets();
     Pet getPetById(int petId);
     boolean updatePet(Pet pet);

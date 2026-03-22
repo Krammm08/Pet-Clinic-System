@@ -37,6 +37,36 @@ public class PetDAOImpl implements PetDAO {
     }
 
     @Override
+    public List<Pet> getPetsByUser(int userId) {
+        List<Pet> petList = new ArrayList<>();
+        String sql = "SELECT * FROM tblpets WHERE user_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Pet pet = new Pet();
+                    pet.setPetId(rs.getInt("pet_id"));
+                    pet.setPetName(rs.getString("pet_name"));
+                    pet.setAnimalType(rs.getString("animal_type"));
+                    pet.setBreed(rs.getString("breed"));
+                    pet.setAge(rs.getInt("age"));
+                    pet.setGender(rs.getString("gender"));
+                    pet.setWeightKg(rs.getInt("weight_kg"));
+                    pet.setUserId(rs.getInt("user_id"));
+                    petList.add(pet);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving user's pets: " + e.getMessage());
+        }
+        return petList;
+    }
+
+    @Override
     public List<Pet> getAllPets() {
         List<Pet> petList = new ArrayList<>();
         String sql = "SELECT * FROM tblpets";

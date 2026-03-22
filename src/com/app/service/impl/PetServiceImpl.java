@@ -5,6 +5,7 @@ import com.app.dao.impl.PetDAOImpl;
 import com.app.model.Pet;
 import com.app.service.PetService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PetServiceImpl implements PetService {
@@ -43,6 +44,14 @@ public class PetServiceImpl implements PetService {
 
         // If all rules pass, execute the DAO
         return petDAO.addPet(pet);
+    }
+    @Override
+    public List<Pet> getPetsByUser(int userId) {
+        if (userId <= 0) {
+            System.out.println("Validation Error: Invalid User ID.");
+            return new ArrayList<>(); // Return empty list if ID is bad
+        }
+        return petDAO.getPetsByUser(userId);
     }
 
     @Override
