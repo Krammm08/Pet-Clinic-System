@@ -6,7 +6,7 @@ import java.util.List;
 public interface TransactionService {
     boolean addTransaction(Transaction transaction);
     List<Transaction> getAllTransactions();
-    Transaction getTransactionById(int id);
+    Transaction getTransactionById(int transactionId);
     boolean updateTransaction(Transaction transaction);
-    boolean deleteTransaction(int id);
+    boolean deleteTransaction(int transactionId);
 }

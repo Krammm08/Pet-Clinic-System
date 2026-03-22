@@ -1,42 +1,113 @@
 package com.app.model;
 
-import java.sql.Timestamp;
-
 public class Transaction {
-    private int transactionID;
-    private int processID;
-    private int userID;
-    private int serviceID;
-    private int medicineID;
+
+    private int transactionId;
+    private int procedureId;
+    private int userId;
+    private int serviceId;
+    private int medicineId;
     private int quantity;
     private int totalAmount;
     private int isPaid;
-    private Timestamp transactionDateTime;
+    private String transactionDateTime;
 
-    public int getTransactionID(){return transactionID;}
-    public void setTransactionID(int transactionID){this.transactionID = transactionID;}
+    // Default Constructor
+    public Transaction() {
+    }
 
-    public int getProcessID(){return processID;}
-    public void setProcessID(int processID){this.processID = processID;}
+    // Full Constructor
+    public Transaction(int transactionId, int procedureId, int userId, int serviceId,
+                       int medicineId, int quantity, int totalAmount,
+                       int isPaid, String transactionDateTime) {
+        this.transactionId = transactionId;
+        this.procedureId = procedureId;
+        this.userId = userId;
+        this.serviceId = serviceId;
+        this.medicineId = medicineId;
+        this.quantity = quantity;
+        this.totalAmount = totalAmount;
+        this.isPaid = isPaid;
+        this.transactionDateTime = transactionDateTime;
+    }
 
-    public int getUserID(){return userID;}
-    public void setUserID(int userID){this.userID = userID;}
+    // Getters and Setters
 
-    public int getServiceID(){return serviceID;}
-    public void setServiceID(int serviceID){this.serviceID = serviceID;}
+    public int getTransactionId() {
+        return transactionId;
+    }
 
-    public int getMedicineID(){return medicineID;}
-    public void setMedicineID(int medicineID){this.medicineID = medicineID;}
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
 
-    public int getQuantity(){return quantity;}
-    public void setQuantity(int quantity){this.quantity = quantity;}
+    public int getProcedureId() {
+        return procedureId;
+    }
 
-    public int getTotalAmount(){return totalAmount;}
-    public void setTotalAmount(int totalAmount){this.totalAmount = totalAmount;}
+    public void setProcedureId(int procedureId) {
+        this.procedureId = procedureId;
+    }
 
-    public int getIsPaid(){return isPaid;}
-    public void setIsPaid(int isPaid){this.isPaid = isPaid;}
+    public int getUserId() {
+        return userId;
+    }
 
-    public Timestamp getTransactionDateTime(){return transactionDateTime;}
-    public void setTransactionDateTime(Timestamp transactionDateTime){this.transactionDateTime = transactionDateTime;}
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(int serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public int getMedicineId() {
+        return medicineId;
+    }
+
+    public void setMedicineId(int medicineId) {
+        this.medicineId = medicineId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public int getIsPaid() {
+        return isPaid;
+    }
+
+    public void setIsPaid(int isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public String getTransactionDateTime() {
+        return transactionDateTime;
+    }
+
+    public void setTransactionDateTime(String transactionDateTime) {
+        this.transactionDateTime = transactionDateTime;
+    }
+
+    // Utility Methods
+
+    public String getPaymentStatus() {
+        return isPaid == 1 ? "PAID" : "PENDING";
+    }
 }

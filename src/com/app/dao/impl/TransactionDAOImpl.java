@@ -2,7 +2,7 @@ package com.app.dao.impl;
 
 import com.app.dao.TransactionDAO;
 import com.app.model.Transaction;
-import com.app.util.DbConnection;
+import com.app.util.DbConnection; // Using your connection utility!
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,57 +10,76 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionDAOImpl implements TransactionDAO{
+public class TransactionDAOImpl implements TransactionDAO {
+
     @Override
-    public boolean addTransaction(Transaction transaction){
-        String sql = "INSERT INTO tbltransactions (transaction_id, process_id, user_id, service_id, medicine_id, quantity, total_amount, is_paid, transaction_datetime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public boolean addTransaction(Transaction transaction) {
+        // Skipping transaction_id and transaction_datetime so MySQL can auto-generate them
+        String sql = "INSERT INTO tbltransactions (procedure_id, user_id, service_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection connection = DbConnection.connect();
-            PreparedStatement prep = connection.prepareStatement(sql)){
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            prep.setInt(1, transaction.getQuantity());
-            prep.setInt(2, transaction.getTotalAmount());
-            prep.setInt(3, transaction.getIsPaid());
-            prep.setTimestamp(5, transaction.getTransactionDateTime());
+            ps.setInt(1, transaction.getProcedureId());
+            ps.setInt(2, transaction.getUserId());
+            ps.setInt(3, transaction.getServiceId());
+            ps.setInt(4, transaction.getMedicineId());
+            ps.setInt(5, transaction.getQuantity());
+            ps.setInt(6, transaction.getTotalAmount());
+            ps.setInt(7, transaction.getIsPaid());
 
-            return prep.executeUpdate() > 0;
-        } catch (Exception e){
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
             System.out.println("Error adding transaction: " + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public List<Transaction> getAllTransactions(){
+    public List<Transaction> getAllTransactions() {
         List<Transaction> transactionList = new ArrayList<>();
-        String sql = "SELECT * FROM tblmedicines";
+        String sql = "SELECT * FROM tbltransactions";
 
-        try(Connection connection = DbConnection.connect();
-            PreparedStatement prep = connection.prepareStatement(sql);
-            ResultSet result = prep.executeQuery()){
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            while(result.next()){
+            while (rs.next()) {
                 Transaction transaction = new Transaction();
 
-                transaction.setTransactionID(result.getInt("transaction_id"));
-                transaction.setTotalAmount(result.getInt("total_amount"));
-                transaction.setIsPaid(result.getInt("is_paid"));
-                transaction.setTransactionDateTime(result.getTimestamp("transaction_datetime"));
+                transaction.setTransactionId(rs.getInt("transaction_id"));
+                transaction.setProcedureId(rs.getInt("procedure_id")); // or process_id if unchanged in DB
+                transaction.setUserId(rs.getInt("user_id"));
+                transaction.setServiceId(rs.getInt("service_id"));
+                transaction.setMedicineId(rs.getInt("medicine_id"));
+                transaction.setQuantity(rs.getInt("quantity"));
+                transaction.setTotalAmount(rs.getInt("total_amount"));
+                transaction.setIsPaid(rs.getInt("is_paid"));
+
+                // Read the datetime from the database as a String
+                transaction.setTransactionDateTime(rs.getString("transaction_datetime"));
 
                 transactionList.add(transaction);
             }
-        }catch (Exception e){
-            System.out.println("Error retrieving transactions; " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error retrieving transactions: " + e.getMessage());
         }
         return transactionList;
     }
 
     @Override
-    public Transaction getTransactionById(int id){return null;}
+    public Transaction getTransactionById(int transactionId) {
+        return null; // TODO: Implement later
+    }
 
     @Override
-    public boolean updateTransaction(Transaction transaction){return false;}
+    public boolean updateTransaction(Transaction transaction) {
+        return false; // TODO: Implement later
+    }
 
     @Override
-    public boolean deleteTransaction(int id){return false;}
+    public boolean deleteTransaction(int transactionId) {
+        return false; // TODO: Implement later
+    }
 }
