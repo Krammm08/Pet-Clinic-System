@@ -1,9 +1,9 @@
 
 package com.app.model;
 
-public class Process {
+public class Procedure {
     
-    private int processId;
+    private int procedureId;
     private int appointmentId;
     private int serviceId;
     private int vetId;
@@ -11,11 +11,11 @@ public class Process {
     private int petId;
     private String diagnosis;
     private int medicineId;
-    private String processDate;
+    private String procedureDate;
     
     // CONSTRUCTOR
-    public void Process(int processId, int appointmentId, int serviceId, int vetId, int userId, int petId, String diagnosis, int medicineId, String processDate){
-        this.processId = processId;
+    public void Procedure(int procedureId, int appointmentId, int serviceId, int vetId, int userId, int petId, String diagnosis, int medicineId, String procedureDate){
+        this.procedureId = procedureId;
         this.appointmentId = appointmentId;
         this.serviceId = serviceId;
         this.vetId = vetId;
@@ -23,17 +23,17 @@ public class Process {
         this.petId = petId;
         this.diagnosis = diagnosis;
         this.medicineId = medicineId;
-        this.processDate = processDate;
+        this.procedureDate = procedureDate;
     } 
     
     // GETTER & SETTER
     
-    public int getProcessId(){
-        return processId;
+    public int getprocedureId(){
+        return procedureId;
     }
     
-    public void setProcessId(int processId){
-        this.processId = processId;
+    public void setProcedureId(int procedureId){
+        this.procedureId = procedureId;
     }
     
     public int getAppointmentId(){
@@ -92,11 +92,11 @@ public class Process {
         this.medicineId = medicineId;
     }
     
-    public String getProcessDate(){
-        return processDate;
+    public String getProcedureDate(){
+        return procedureDate;
     }
     
-    public void setProcessDate(String processDate){
-        this.processDate = processDate;
+    public void setProcedureDate(String procedureDate){
+        this.procedureDate = procedureDate;
     }
 }
