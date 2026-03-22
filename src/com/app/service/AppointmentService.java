@@ -21,4 +21,5 @@ public interface AppointmentService {
 
     boolean declineAppointment(int appointmentId) throws DatabaseException;
 
+    boolean addAppointment(Appointment appt);
 }

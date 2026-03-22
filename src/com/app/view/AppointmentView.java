@@ -1,5 +1,6 @@
 package com.app.view;
 
+import com.app.exception.DatabaseException;
 import com.app.model.Appointment;
 import com.app.model.User;
 import com.app.service.AppointmentService;
@@ -35,7 +36,7 @@ public class AppointmentView {
     }
 
     // ADMIN SIDE
-    public void adminMenu() {
+    public void adminMenu() throws DatabaseException {
         while (true) {
             System.out.println("\n\t===== MANAGE APPOINTMENTS =====");
             System.out.println("\t|\t1. View All Appointments");
@@ -59,8 +60,8 @@ public class AppointmentView {
     private void bookAppointment(User user) {
         Appointment appt = new Appointment();
 
-        appt.setUserId(user.getUserId());
-        appt.setPetId(InputUtil.getInt("\tEnter Pet ID: "));
+        appt.setUserID(user.getUserId());
+        appt.setPetID(InputUtil.getInt("\tEnter Pet ID: "));
         appt.setServiceId(InputUtil.getInt("\tEnter Service ID: "));
 
         // FIX: Converting the String from the keyboard into a SQL Date/Time format!
@@ -98,9 +99,9 @@ public class AppointmentView {
         }
 
         for (Appointment appt : list) {
-            System.out.println("\tID: " + appt.getAppointmentId());
-            System.out.println("\tPet ID: " + appt.getPetId());
-            System.out.println("\tService ID: " + appt.getServiceId());
+            System.out.println("\tID: " + appt.getAppointmentID());
+            System.out.println("\tPet ID: " + appt.getPetID());
+            System.out.println("\tService ID: " + appt.getServiceID());
             System.out.println("\tDate: " + appt.getAppointmentDate());
             System.out.println("\tTime: " + appt.getAppointmentTime());
             System.out.println("\tStatus: " + getStatus(appt.getIsApprove()));
@@ -109,7 +110,7 @@ public class AppointmentView {
     }
 
     // VIEW ALL (ADMIN)
-    private void viewAllAppointments() {
+    private void viewAllAppointments() throws DatabaseException {
         List<Appointment> list = appointmentService.getAllAppointments();
 
         System.out.println("\n\t===== ALL APPOINTMENTS =====");
@@ -120,10 +121,10 @@ public class AppointmentView {
         }
 
         for (Appointment appt : list) {
-            System.out.println("\tID: " + appt.getAppointmentId());
-            System.out.println("\tUser ID: " + appt.getUserId());
-            System.out.println("\tPet ID: " + appt.getPetId());
-            System.out.println("\tService ID: " + appt.getServiceId());
+            System.out.println("\tID: " + appt.getAppointmentID());
+            System.out.println("\tUser ID: " + appt.getUserID());
+            System.out.println("\tPet ID: " + appt.getPetID());
+            System.out.println("\tService ID: " + appt.getServiceID());
             System.out.println("\tDate: " + appt.getAppointmentDate());
             System.out.println("\tTime: " + appt.getAppointmentTime());
             System.out.println("\tStatus: " + getStatus(appt.getIsApprove()));
@@ -132,7 +133,7 @@ public class AppointmentView {
     }
 
     // APPROVE (ADMIN)
-    private void approveAppointment() {
+    private void approveAppointment() throws DatabaseException {
         int id = InputUtil.getInt("\tEnter Appointment ID to approve: ");
         boolean success = appointmentService.approveAppointment(id);
 
@@ -144,7 +145,7 @@ public class AppointmentView {
     }
 
     // DECLINE (ADMIN)
-    private void declineAppointment() {
+    private void declineAppointment() throws DatabaseException {
         int id = InputUtil.getInt("\tEnter Appointment ID to decline: ");
         boolean success = appointmentService.declineAppointment(id);
 
