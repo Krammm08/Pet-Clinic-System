@@ -9,6 +9,6 @@ public interface ProcedureDAO {
     boolean addProcedure(Procedure procedure);
     List<Procedure> getAllProcedure();
     Procedure getProcedureById(int id);
-    boolean updateProcedure(Medicine medicine);
+    boolean updateProcedure(Procedure procedure);
     boolean deleteProcedure(int id);
 }

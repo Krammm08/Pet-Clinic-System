@@ -1,6 +1,8 @@
 
 package com.app.model;
 
+import java.util.Date;
+
 public class Procedure {
     
     private int procedureId;
@@ -11,10 +13,10 @@ public class Procedure {
     private int petId;
     private String diagnosis;
     private int medicineId;
-    private String procedureDate;
+    private Date procedureDate;
     
     // CONSTRUCTOR
-    public void Procedure(int procedureId, int appointmentId, int serviceId, int vetId, int userId, int petId, String diagnosis, int medicineId, String procedureDate){
+    public void Procedure(int procedureId, int appointmentId, int serviceId, int vetId, int userId, int petId, String diagnosis, int medicineId, Date procedureDate){
         this.procedureId = procedureId;
         this.appointmentId = appointmentId;
         this.serviceId = serviceId;
@@ -92,11 +94,11 @@ public class Procedure {
         this.medicineId = medicineId;
     }
     
-    public String getProcedureDate(){
+    public Date getProcedureDate(){
         return procedureDate;
     }
     
-    public void setProcedureDate(String procedureDate){
+    public void setProcedureDate(Date procedureDate){
         this.procedureDate = procedureDate;
     }
 }
