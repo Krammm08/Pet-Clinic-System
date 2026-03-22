@@ -5,69 +5,82 @@ import com.app.model.Appointment;
 import com.app.util.DbConnection;
 import com.app.exception.DatabaseException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentDAOImpl implements AppointmentDAO {
 
     @Override
-    public boolean insertAppointment(Appointment appointment) throws DatabaseException {
-        // We skip appointment_id as it is AUTO_INCREMENT
-        String sql = "INSERT INTO tblappointments (user_id, pet_id, service_id, appointment_date, appointment_time, is_approve) VALUES (?, ?, ?, ?, ?, ?)";
+    public void insertAppointment(Appointment appointment) throws DatabaseException {
+        // SQL 1: The Booking
+        String sqlApp = "INSERT INTO tblappointments (pet_id, service_id, user_id, appointment_date, appointment_time, is_approve) VALUES (?, ?, ?, ?, ?, 0)";
 
-        try (Connection conn = DbConnection.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        // SQL 2: The Medical Link (Using Vet #1 and Medicine #0 placeholders)
+        String sqlProc = "INSERT INTO tblprocedures (appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id, procedure_date) VALUES (?, ?, 1, ?, ?, 'Pending Exam', 0, ?)";
 
-            ps.setInt(1, appointment.getUserID());
-            ps.setInt(2, appointment.getPetID());
-            ps.setInt(3, appointment.getServiceID());
-            ps.setDate(4, appointment.getAppointmentDate());
-            ps.setTime(5, appointment.getAppointmentTime());
+        // SQL 3: The Bill (Automatically set to 'is_paid = 0')
+        String sqlTrans = "INSERT INTO tbltransactions (user_id, service_id, procedure_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, 0, 1, ?, 0)";
 
-            // Usually starts as 0 (Pending) when first created
-            ps.setInt(6, appointment.getIsApprove());
+        Connection conn = null;
+        try {
+            conn = DbConnection.connect();
+            conn.setAutoCommit(false); // All three must succeed together
 
-            return ps.executeUpdate() > 0;
+            int generatedAppId = 0;
+            int generatedProcId = 0;
+
+            // --- STEP 1: AUTO-SAVE APPOINTMENT ---
+            try (PreparedStatement stmtApp = conn.prepareStatement(sqlApp, Statement.RETURN_GENERATED_KEYS)) {
+                stmtApp.setInt(1, appointment.getPetID());
+                stmtApp.setInt(2, appointment.getServiceID());
+                stmtApp.setInt(3, appointment.getUserID());
+                stmtApp.setDate(4, appointment.getAppointmentDate());
+                stmtApp.setTime(5, appointment.getAppointmentTime());
+                stmtApp.executeUpdate();
+
+                ResultSet rs = stmtApp.getGeneratedKeys();
+                if (rs.next()) generatedAppId = rs.getInt(1);
+                System.out.println("[DEBUG] Appointment saved! ID: " + generatedAppId);
+            }
+
+            // --- STEP 2: AUTO-SAVE PROCEDURE ---
+            try (PreparedStatement stmtProc = conn.prepareStatement(sqlProc, Statement.RETURN_GENERATED_KEYS)) {
+                stmtProc.setInt(1, generatedAppId);
+                stmtProc.setInt(2, appointment.getServiceID());
+                stmtProc.setInt(3, appointment.getUserID());
+                stmtProc.setInt(4, appointment.getPetID());
+                stmtProc.setDate(5, appointment.getAppointmentDate());
+                stmtProc.executeUpdate();
+
+                ResultSet rs = stmtProc.getGeneratedKeys();
+                if (rs.next()) generatedProcId = rs.getInt(1);
+                System.out.println("[DEBUG] Procedure linked! ID: " + generatedProcId);
+            }
+
+            // --- STEP 3: AUTO-SAVE TRANSACTION (THE BILL) ---
+            double totalAmount = 500.0; // Placeholder: Replace with service fee logic
+            try (PreparedStatement stmtTrans = conn.prepareStatement(sqlTrans)) {
+                stmtTrans.setInt(1, appointment.getUserID());
+                stmtTrans.setInt(2, appointment.getServiceID());
+                stmtTrans.setInt(3, generatedProcId);
+                stmtTrans.setDouble(4, totalAmount);
+                stmtTrans.executeUpdate();
+                System.out.println("[DEBUG] Transaction created! Status: UNPAID");
+            }
+
+            conn.commit(); // Finalize all inserts
+            System.out.println("\t-> Full Booking Sequence Complete!");
 
         } catch (SQLException e) {
-            // Throwing your custom exception instead of just printing it!
-            throw new DatabaseException("Failed to insert appointment: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Appointment> getUserAppointments(int userId) {
-        List<Appointment> apptList = new ArrayList<>();
-        String sql = "SELECT * FROM tblappointments WHERE user_id = ?";
-
-        try (Connection conn = DbConnection.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, userId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Appointment appt = new Appointment();
-                    appt.setAppointmentID(rs.getInt("appointment_id"));
-                    appt.setUserID(rs.getInt("user_id"));
-                    appt.setPetID(rs.getInt("pet_id"));
-                    appt.setServiceId(rs.getInt("service_id"));
-                    appt.setAppointmentDate(rs.getDate("appointment_date"));
-                    appt.setAppointmentTime(rs.getTime("appointment_time"));
-                    appt.setIsApprove(rs.getInt("is_approve"));
-                    apptList.add(appt);
-                }
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
-        } catch (Exception e) {
-            System.out.println("Error retrieving user appointments: " + e.getMessage());
+            // THIS WILL TELL YOU THE REAL ERROR IN YOUR CONSOLE
+            System.out.println("\tX DATABASE ERROR: " + e.getMessage());
+            throw new DatabaseException("Failed to automate transaction: " + e.getMessage());
         }
-        return apptList;
     }
-
     @Override
     public List<Appointment> getAppointmentsByUserId(int userId) throws DatabaseException {
         List<Appointment> appointmentList = new ArrayList<>();
@@ -176,5 +189,24 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         appointment.setAppointmentTime(rs.getTime("appointment_time"));
         appointment.setIsApprove(rs.getInt("is_approve"));
         return appointment;
+    }
+    @Override
+    public boolean updateAppointmentStatus(int appointmentId, String status) throws DatabaseException {
+        // Notice I am guessing your column is named 'is_approve' based on your getter method.
+        // If your database column is named 'status', change 'is_approve' to 'status' in the SQL string!
+        String sql = "UPDATE tblappointments SET is_approve = ? WHERE appointment_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
+            stmt.setInt(2, appointmentId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Returns true if the database was successfully updated
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Error updating appointment status: " + e.getMessage());
+        }
     }
 }

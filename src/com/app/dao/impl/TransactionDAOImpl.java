@@ -7,6 +7,7 @@ import com.app.util.DbConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class TransactionDAOImpl implements TransactionDAO {
             ps.setInt(3, transaction.getServiceId());
             ps.setInt(4, transaction.getMedicineId());
             ps.setInt(5, transaction.getQuantity());
-            ps.setInt(6, transaction.getTotalAmount());
+            ps.setDouble(6, transaction.getTotalAmount());
             ps.setInt(7, transaction.getIsPaid());
 
             return ps.executeUpdate() > 0;
@@ -54,29 +55,37 @@ public class TransactionDAOImpl implements TransactionDAO {
         return transactionList;
     }
 
+    @Override
+    public Transaction getTransactionById(int transactionId) {
+        return null;
+    }
+
     // FIXED: Added the missing method required by the Interface
     @Override
     public List<Transaction> getUserTransactions(int userId) {
-        List<Transaction> transactionList = new ArrayList<>();
+        List<Transaction> transactions = new ArrayList<>();
+        // Ensure these names match your XAMPP columns exactly!
         String sql = "SELECT * FROM tbltransactions WHERE user_id = ?";
 
         try (Connection conn = DbConnection.connect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, userId);
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Transaction transaction = mapResultSetToTransaction(rs);
-                    transactionList.add(transaction);
-                }
+            while (rs.next()) {
+                Transaction t = new Transaction();
+                t.setTransactionId(rs.getInt("transaction_id"));
+                t.setTotalAmount(rs.getDouble("total_amount"));
+                t.setIsPaid(rs.getInt("is_paid"));
+                // ... set other fields ...
+                transactions.add(t);
             }
-        } catch (Exception e) {
-            System.out.println("Error retrieving user transactions: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("\t[DEBUG] DAO Error: " + e.getMessage());
         }
-        return transactionList;
+        return transactions;
     }
-
     // Helper method to avoid repeating the "rs.get..." code twice
     private Transaction mapResultSetToTransaction(ResultSet rs) throws java.sql.SQLException {
         Transaction t = new Transaction();
@@ -90,11 +99,6 @@ public class TransactionDAOImpl implements TransactionDAO {
         t.setIsPaid(rs.getInt("is_paid"));
         t.setTransactionDateTime(rs.getString("transaction_datetime"));
         return t;
-    }
-
-    @Override
-    public Transaction getTransactionById(int transactionId) {
-        return null; // TODO: Implement later
     }
 
     @Override

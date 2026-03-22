@@ -30,6 +30,13 @@ public class InputUtil {
                 System.out.println("\tX Invalid input. Please enter a valid number.");
             }
         }
+
         return input;
+    }
+    public static String getString(String prompt) {
+        System.out.print(prompt);
+        // If you are using a static Scanner named 'scanner', use it here.
+        // The .trim() removes any accidental spaces the user types before or after.
+        return scanner.nextLine().trim();
     }
 }

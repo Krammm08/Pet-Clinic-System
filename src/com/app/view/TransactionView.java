@@ -34,7 +34,7 @@ public class TransactionView {
                     break;
 
                 case 2:
-                    payTransaction();
+                    payTransaction(user);
                     break;
 
                 case 3:
@@ -112,15 +112,72 @@ public class TransactionView {
     }
 
     // PAY TRANSACTION
-    private void payTransaction() {
-        int id = InputUtil.getInt("\tEnter Transaction ID to pay: ");
+    private void payTransaction(User user) {
+        System.out.println("\n\t--- PAY TRANSACTION ---");
 
-        boolean success = transactionService.payTransaction(id);
+        try {
+            // 1. Fetch ALL transactions for this user
+            List<Transaction> myTransactions = transactionService.getUserTransactions(user.getUserId());
 
-        if (success) {
-            System.out.println("\t-> Payment successful! Thank you.");
-        } else {
-            System.out.println("\tX Payment failed. Please check the Transaction ID.");
+            // 2. Filter for UNPAID only (Status 0)
+            List<Transaction> unpaidBills = new java.util.ArrayList<>();
+            for (Transaction t : myTransactions) {
+                if (t.getIsPaid() == 0) {
+                    unpaidBills.add(t);
+                }
+            }
+
+            if (unpaidBills.isEmpty()) {
+                System.out.println("\t[!] You have no pending bills. All caught up!");
+                return;
+            }
+
+            // 3. Display the detailed bill list
+            System.out.println("\n\t--- YOUR UNPAID BILLS ---");
+            System.out.println("\tID\tService ID\tAmount\t\tStatus");
+            System.out.println("\t--------------------------------------------------");
+            for (Transaction t : unpaidBills) {
+                System.out.println("\t[" + t.getTransactionId() + "]\tService #" + t.getServiceId()
+                        + "\tPhp " + t.getTotalAmount() + "\t[PENDING]");
+            }
+            System.out.println("\t--------------------------------------------------");
+
+            // 4. Select the bill
+            int transId = InputUtil.getInt("\tSelect Transaction ID to pay: ");
+
+            // 5. Verification & Summary
+            Transaction selectedBill = null;
+            for (Transaction t : unpaidBills) {
+                if (t.getTransactionId() == transId) {
+                    selectedBill = t;
+                    break;
+                }
+            }
+
+            if (selectedBill == null) {
+                System.out.println("\tX Invalid ID. Please choose a bill from the list above.");
+                return;
+            }
+
+            // --- THE CONFIRMATION STEP ---
+            System.out.println("\n\t--- PAYMENT SUMMARY ---");
+            System.out.println("\tService ID: " + selectedBill.getServiceId());
+            System.out.println("\tTotal Due : Php " + selectedBill.getTotalAmount());
+            String confirm = InputUtil.getString("\tConfirm payment? (Y/N): ");
+
+            if (confirm.equalsIgnoreCase("Y")) {
+                boolean success = transactionService.payTransaction(transId);
+                if (success) {
+                    System.out.println("\t-> Payment successful! Your appointment is now cleared.");
+                } else {
+                    System.out.println("\tX Payment failed in database.");
+                }
+            } else {
+                System.out.println("\t-> Payment cancelled.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("\tX Error: " + e.getMessage());
         }
     }
 

@@ -2,6 +2,7 @@ package com.app.service.impl;
 
 import com.app.dao.OfferedServiceDAO;
 import com.app.dao.impl.OfferedServiceDAOImpl;
+import com.app.exception.DatabaseException;
 import com.app.model.OfferedService;
 import com.app.service.OfferedServiceService;
 
@@ -29,7 +30,7 @@ public class OfferedServiceServiceImpl implements OfferedServiceService {
     }
 
     @Override
-    public List<OfferedService> getAllServices() {
+    public List<OfferedService> getAllServices() throws DatabaseException {
         return serviceDAO.getAllServices();
     }
 

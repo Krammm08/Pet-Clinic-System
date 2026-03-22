@@ -1,30 +1,42 @@
 package com.app.view;
 
-import com.app.exception.DatabaseException;
 import com.app.model.Appointment;
+import com.app.model.OfferedService;
 import com.app.model.User;
+import com.app.model.Pet;
+import com.app.model.Transaction; // <-- NEW: Imported Transaction Model
 import com.app.service.AppointmentService;
+import com.app.service.OfferedServiceService;
+import com.app.service.PetService;
+import com.app.service.TransactionService; // <-- NEW: Imported Transaction Service
 import com.app.service.impl.AppointmentServiceImpl;
-import com.app.util.Asciiart;
+import com.app.service.impl.OfferedServiceServiceImpl;
+import com.app.service.impl.PetServiceImpl;
+import com.app.service.impl.TransactionServiceImpl; // <-- NEW: Imported Transaction Impl
 import com.app.util.InputUtil;
-
+import com.app.exception.DatabaseException;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 
 public class AppointmentView {
 
     private final AppointmentService appointmentService = new AppointmentServiceImpl();
-    private final Asciiart art = new Asciiart();
+    private final OfferedServiceService offeredServiceService = new OfferedServiceServiceImpl();
+    private final PetService petService = new PetServiceImpl();
 
-    // CUSTOMER SIDE
-    public void customerMenu(User user) throws DatabaseException {
+    // --- NEW: We bring the Transaction tools into the Appointment View! ---
+    private final TransactionService transactionService = new TransactionServiceImpl();
+
+    public void customerMenu(User user) {
         while (true) {
             System.out.println("\n\t============ APPOINTMENT MENU ============");
             System.out.println("\t|\t1. Book Appointment");
             System.out.println("\t|\t2. View My Appointments");
-            System.out.println("\t|\t3. Back");
+            System.out.println("\t|\t3. Back to Main Menu");
             System.out.println("\t==========================================");
+
             int choice = InputUtil.getInt("\tChoose option: ");
-            System.out.println("\t==========================================\n");
 
             switch (choice) {
                 case 1: bookAppointment(user); break;
@@ -35,15 +47,15 @@ public class AppointmentView {
         }
     }
 
-    // ADMIN SIDE
-    public void adminMenu() throws DatabaseException {
+    public void adminMenu() {
         while (true) {
-            System.out.println("\n\t===== MANAGE APPOINTMENTS =====");
+            System.out.println("\n\t====== ADMIN APPOINTMENT MENU ======");
             System.out.println("\t|\t1. View All Appointments");
             System.out.println("\t|\t2. Approve Appointment");
             System.out.println("\t|\t3. Decline Appointment");
-            System.out.println("\t|\t4. Back");
-            System.out.println("\t===============================");
+            System.out.println("\t|\t4. Back to Main Menu");
+            System.out.println("\t====================================");
+
             int choice = InputUtil.getInt("\tChoose option: ");
 
             switch (choice) {
@@ -56,112 +68,182 @@ public class AppointmentView {
         }
     }
 
-    // BOOK APPOINTMENT
-    private void bookAppointment(User user) throws DatabaseException {
-        Appointment appt = new Appointment();
+    private void bookAppointment(User user) {
+        System.out.println("\n\t--- BOOK AN APPOINTMENT ---");
 
-        appt.setUserID(user.getUserId());
-        appt.setPetID(InputUtil.getInt("\tEnter Pet ID: "));
-        appt.setServiceId(InputUtil.getInt("\tEnter Service ID: "));
-
-        // FIX: Converting the String from the keyboard into a SQL Date/Time format!
         try {
-            String dateInput = InputUtil.getNonEmptyString("\tDate (YYYY-MM-DD): ");
-            appt.setAppointmentDate(java.sql.Date.valueOf(dateInput));
+            System.out.println("\n\t--- AVAILABLE SERVICES ---");
+            List<OfferedService> services = offeredServiceService.getAllServices();
 
-            String timeInput = InputUtil.getNonEmptyString("\tTime (HH:MM): ");
-            // SQL Time requires seconds, so we automatically add ":00" to the end
-            appt.setAppointmentTime(java.sql.Time.valueOf(timeInput + ":00"));
-        } catch (IllegalArgumentException e) {
-            System.out.println("\tX Invalid Date or Time format! Please use YYYY-MM-DD and HH:MM.");
-            return; // Stop the process if they type a bad date
-        }
+            if (services.isEmpty()) {
+                System.out.println("\t[!] No services available right now.");
+                return;
+            }
 
-        // FIX: Method name changed to match your Service implementation
-        boolean success = appointmentService.insertAppointment(appt);
+            for (OfferedService service : services) {
+                System.out.println("\t[" + service.getServiceId() + "] "
+                        + service.getServiceType() + " - Php "
+                        + service.getServiceFee());
+            }
+            System.out.println("\t--------------------------");
 
-        if (success) {
-            System.out.println("\t-> Appointment booked! Waiting for Admin approval.");
-        } else {
-            System.out.println("\tX Failed to book appointment.");
+            System.out.println("\n\t--- MY REGISTERED PETS ---");
+            List<Pet> myPets = petService.getPetsByUser(user.getUserId());
+
+            if (myPets.isEmpty()) {
+                System.out.println("\t[!] You have no registered pets. Please register a pet first.");
+                return;
+            }
+
+            for (Pet pet : myPets) {
+                System.out.println("\t[" + pet.getPetId() + "] " + pet.getPetName());
+            }
+            System.out.println("\t--------------------------");
+
+            int petId = InputUtil.getInt("\tEnter Pet ID: ");
+            int serviceId = InputUtil.getInt("\tEnter Service ID: ");
+            String dateStr = InputUtil.getString("\tDate (YYYY-MM-DD): ");
+            String timeStr = InputUtil.getString("\tTime (HH:MM): ");
+
+            // --- NEW LOGIC: Find the exact price of the service they chose ---
+            double servicePrice = 0.0;
+            for (OfferedService service : services) {
+                if (service.getServiceId() == serviceId) {
+                    servicePrice = service.getServiceFee();
+                    break;
+                }
+            }
+
+            Appointment newAppointment = new Appointment();
+            newAppointment.setPetID(petId);
+            newAppointment.setServiceId(serviceId);
+            newAppointment.setUserID(user.getUserId());
+
+            try {
+                Date sqlDate = Date.valueOf(dateStr);
+                Time sqlTime = Time.valueOf(timeStr + ":00");
+
+                java.time.LocalDate inputDate = sqlDate.toLocalDate();
+                java.time.LocalDate today = java.time.LocalDate.now();
+
+                if (inputDate.isBefore(today)) {
+                    System.out.println("\tX Booking failed: You cannot book an appointment in the past.");
+                    return;
+                }
+
+                newAppointment.setAppointmentDate(sqlDate);
+                newAppointment.setAppointmentTime(sqlTime);
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("\tX Invalid date or time format! Please exactly match YYYY-MM-DD and HH:MM.");
+                return;
+            }
+
+            // 1. Save the Appointment
+            appointmentService.insertAppointment(newAppointment);
+            System.out.println("\t-> Appointment booked successfully! Pending admin approval.");
+
+            // ==========================================
+            // NEW LOGIC: AUTOMATIC BILLING GENERATION
+            // ==========================================
+            Transaction autoBill = new Transaction();
+            autoBill.setUserId(user.getUserId());
+            autoBill.setServiceId(serviceId);
+            autoBill.setProcedureId(1); // Assuming '1' is a valid default ID for "Consultation/Booking"
+            autoBill.setMedicineId(0);  // 0 means no medicine attached yet
+            autoBill.setQuantity(1);
+            autoBill.setTotalAmount(servicePrice);
+            autoBill.setIsPaid(0); // Set to 0 so it shows up as "Pending" in their billing menu!
+
+            // Check your Transaction.java model to ensure setter names match (e.g., setUserId vs setUserID)
+
+            boolean billSuccess = transactionService.addTransaction(autoBill);
+
+            if (billSuccess) {
+                System.out.println("\t-> A pending bill of Php " + servicePrice + " has been added to your account.");
+                System.out.println("\t-> You can pay for this in advance through the 'Billing & Transactions' menu.");
+            }
+            // ==========================================
+
+        } catch (DatabaseException e) {
+            System.out.println("\tX Error booking appointment: " + e.getMessage());
         }
     }
 
-    // VIEW USER APPOINTMENTS
     private void viewUserAppointments(User user) {
-        List<Appointment> list = appointmentService.getUserAppointments(user.getUserId());
+        System.out.println("\n\t--- MY APPOINTMENTS ---");
+        try {
+            List<Appointment> myAppointments = appointmentService.getAppointmentsByUserId(user.getUserId());
 
-        System.out.println("\n\t===== MY APPOINTMENTS =====");
+            if (myAppointments.isEmpty()) {
+                System.out.println("\tYou don't have any appointments booked yet.");
+                return;
+            }
 
-        if (list.isEmpty()) {
-            System.out.println("\tNo appointments found.");
-            return;
-        }
-
-        for (Appointment appt : list) {
-            System.out.println("\tID: " + appt.getAppointmentID());
-            System.out.println("\tPet ID: " + appt.getPetID());
-            System.out.println("\tService ID: " + appt.getServiceID());
-            System.out.println("\tDate: " + appt.getAppointmentDate());
-            System.out.println("\tTime: " + appt.getAppointmentTime());
-            System.out.println("\tStatus: " + getStatus(appt.getIsApprove()));
-            System.out.println("\t------------------------");
-        }
-    }
-
-    // VIEW ALL (ADMIN)
-    private void viewAllAppointments() throws DatabaseException {
-        List<Appointment> list = appointmentService.getAllAppointments();
-
-        System.out.println("\n\t===== ALL APPOINTMENTS =====");
-
-        if (list.isEmpty()) {
-            System.out.println("\tNo appointments found.");
-            return;
-        }
-
-        for (Appointment appt : list) {
-            System.out.println("\tID: " + appt.getAppointmentID());
-            System.out.println("\tUser ID: " + appt.getUserID());
-            System.out.println("\tPet ID: " + appt.getPetID());
-            System.out.println("\tService ID: " + appt.getServiceID());
-            System.out.println("\tDate: " + appt.getAppointmentDate());
-            System.out.println("\tTime: " + appt.getAppointmentTime());
-            System.out.println("\tStatus: " + getStatus(appt.getIsApprove()));
-            System.out.println("\t------------------------");
+            System.out.println("\tID\tDate\t\tTime\tStatus");
+            System.out.println("\t--------------------------------------------------");
+            for (Appointment app : myAppointments) {
+                System.out.println("\t[" + app.getAppointmentID() + "]\t"
+                        + app.getAppointmentDate() + "\t"
+                        + app.getAppointmentTime() + "\t"
+                        + "[" + app.getIsApprove() + "]");
+            }
+        } catch (DatabaseException e) {
+            System.out.println("\tX Error loading appointments: " + e.getMessage());
         }
     }
 
-    // APPROVE (ADMIN)
-    private void approveAppointment() throws DatabaseException {
-        int id = InputUtil.getInt("\tEnter Appointment ID to approve: ");
-        boolean success = appointmentService.approveAppointment(id);
+    private void viewAllAppointments() {
+        System.out.println("\n\t--- ALL CLINIC APPOINTMENTS ---");
+        try {
+            List<Appointment> allAppointments = appointmentService.getAllAppointments();
 
-        if (success) {
-            System.out.println("\t-> Appointment approved.");
-        } else {
-            System.out.println("\tX Failed to approve. Check the ID.");
+            if (allAppointments.isEmpty()) {
+                System.out.println("\tThere are no appointments in the system.");
+                return;
+            }
+
+            System.out.println("\tID\tPet ID\tDate\t\tTime\tStatus");
+            System.out.println("\t---------------------------------------------------------");
+            for (Appointment app : allAppointments) {
+                System.out.println("\t[" + app.getAppointmentID() + "]\t"
+                        + app.getPetID() + "\t"
+                        + app.getAppointmentDate() + "\t"
+                        + app.getAppointmentTime() + "\t"
+                        + "[" + app.getIsApprove() + "]");
+            }
+        } catch (DatabaseException e) {
+            System.out.println("\tX Error loading appointments: " + e.getMessage());
         }
     }
 
-    // DECLINE (ADMIN)
-    private void declineAppointment() throws DatabaseException {
-        int id = InputUtil.getInt("\tEnter Appointment ID to decline: ");
-        boolean success = appointmentService.declineAppointment(id);
-
-        if (success) {
-            System.out.println("\t-> Appointment declined.");
-        } else {
-            System.out.println("\tX Failed to decline. Check the ID.");
+    private void approveAppointment() {
+        System.out.println("\n\t--- APPROVE APPOINTMENT ---");
+        int appId = InputUtil.getInt("\tEnter Appointment ID to Approve: ");
+        try {
+            boolean success = appointmentService.updateAppointmentStatus(appId, "Approved");
+            if (success) {
+                System.out.println("\t-> Appointment [" + appId + "] has been APPROVED.");
+            } else {
+                System.out.println("\tX Failed to approve. Check if the ID exists.");
+            }
+        } catch (DatabaseException e) {
+            System.out.println("\tX Database Error: " + e.getMessage());
         }
     }
 
-    // STATUS HELPER
-    private String getStatus(int status) {
-        switch (status) {
-            case 1: return "APPROVED";
-            case 2: return "DECLINED";
-            default: return "PENDING"; // 0 usually means pending
+    private void declineAppointment() {
+        System.out.println("\n\t--- DECLINE APPOINTMENT ---");
+        int appId = InputUtil.getInt("\tEnter Appointment ID to Decline: ");
+        try {
+            boolean success = appointmentService.updateAppointmentStatus(appId, "Declined");
+            if (success) {
+                System.out.println("\t-> Appointment [" + appId + "] has been DECLINED.");
+            } else {
+                System.out.println("\tX Failed to decline. Check if the ID exists.");
+            }
+        } catch (DatabaseException e) {
+            System.out.println("\tX Database Error: " + e.getMessage());
         }
     }
 }

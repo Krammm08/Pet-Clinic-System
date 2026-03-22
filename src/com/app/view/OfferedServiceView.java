@@ -14,7 +14,7 @@ public class OfferedServiceView {
     private final OfferedServiceDAO OfferedServiceDAO = new OfferedServiceDAOImpl();
     private final Asciiart art = new Asciiart();
     
-    public void show(User user) {
+    public void show(User user) throws DatabaseException {
 
         while (true) {
             
@@ -39,7 +39,7 @@ public class OfferedServiceView {
         }
     }
     
-    private void viewAllVets() {
+    private void viewAllVets() throws DatabaseException {
         List<OfferedService> list = OfferedServiceDAO.getAllServices();
 
         System.out.println("\n\t========== ALL OFFERED SERVICES ==========");

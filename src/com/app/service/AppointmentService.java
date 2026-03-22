@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface AppointmentService {
 
-    boolean insertAppointment(Appointment appointment) throws DatabaseException;
+    void insertAppointment(Appointment appointment) throws DatabaseException;
     List<Appointment> getUserAppointments(int userId);
 
     // Get all appointments of a user
@@ -23,4 +23,6 @@ public interface AppointmentService {
 
     // Decline appointment
     boolean declineAppointment(int appointmentId) throws DatabaseException;
+
+    boolean updateAppointmentStatus(int appointmentId, String status) throws DatabaseException;
 }

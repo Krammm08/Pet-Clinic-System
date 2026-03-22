@@ -8,7 +8,7 @@ public class Transaction {
     private int serviceId;
     private int medicineId;
     private int quantity;
-    private int totalAmount;
+    private double totalAmount;
     private int isPaid;
     private String transactionDateTime;
 
@@ -81,11 +81,11 @@ public class Transaction {
         this.quantity = quantity;
     }
 
-    public int getTotalAmount() {
+    public double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(int totalAmount) {
+    public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
