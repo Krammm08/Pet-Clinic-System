@@ -2,7 +2,8 @@ package com.app.dao.impl;
 
 import com.app.dao.MedicineDAO;
 import com.app.model.Medicine;
-import com.app.config.DBConnection;
+import com.app.util.DbConnection;
+import com.app.util.DbConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class MedicineDAOImpl implements MedicineDAO {
         // Skipping medicine_id because MySQL auto-increments it
         String sql = "INSERT INTO tblmedicines (med_name, cost, inventory_count) VALUES (?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DbConnection.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, medicine.getMedName());
@@ -37,7 +38,7 @@ public class MedicineDAOImpl implements MedicineDAO {
         List<Medicine> medicineList = new ArrayList<>();
         String sql = "SELECT * FROM tblmedicines";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DbConnection.connect();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
