@@ -16,7 +16,7 @@ public class AppointmentView {
     private final Asciiart art = new Asciiart();
 
     // CUSTOMER SIDE
-    public void customerMenu(User user) {
+    public void customerMenu(User user) throws DatabaseException {
         while (true) {
             System.out.println("\n\t============ APPOINTMENT MENU ============");
             System.out.println("\t|\t1. Book Appointment");
@@ -57,7 +57,7 @@ public class AppointmentView {
     }
 
     // BOOK APPOINTMENT
-    private void bookAppointment(User user) {
+    private void bookAppointment(User user) throws DatabaseException {
         Appointment appt = new Appointment();
 
         appt.setUserID(user.getUserId());
@@ -78,7 +78,7 @@ public class AppointmentView {
         }
 
         // FIX: Method name changed to match your Service implementation
-        boolean success = appointmentService.addAppointment(appt);
+        boolean success = appointmentService.insertAppointment(appt);
 
         if (success) {
             System.out.println("\t-> Appointment booked! Waiting for Admin approval.");

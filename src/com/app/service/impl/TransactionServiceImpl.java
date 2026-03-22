@@ -5,6 +5,7 @@ import com.app.dao.impl.TransactionDAOImpl;
 import com.app.model.Transaction;
 import com.app.service.TransactionService;
 
+import java.util.ArrayList; // Added import for the empty list fallback
 import java.util.List;
 
 public class TransactionServiceImpl implements TransactionService {
@@ -55,6 +56,25 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getAllTransactions() {
         return transactionDAO.getAllTransactions();
+    }
+
+    // FIXED: Implementing the missing method from your interface
+    @Override
+    public List<Transaction> getUserTransactions(int userId) {
+        if (userId <= 0) {
+            System.out.println("Validation Error: Invalid User ID.");
+            return new ArrayList<>(); // Return empty list instead of null to prevent crashes
+        }
+        return transactionDAO.getUserTransactions(userId);
+    }
+
+    @Override
+    public boolean payTransaction(int transactionId) {
+        if (transactionId <= 0) {
+            System.out.println("Validation Error: Invalid Transaction ID.");
+            return false;
+        }
+        return transactionDAO.payTransaction(transactionId);
     }
 
     @Override

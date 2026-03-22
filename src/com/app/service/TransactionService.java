@@ -9,4 +9,6 @@ public interface TransactionService {
     Transaction getTransactionById(int transactionId);
     boolean updateTransaction(Transaction transaction);
     boolean deleteTransaction(int transactionId);
+    List<Transaction> getUserTransactions(int userId);
+    boolean payTransaction(int transactionId);
 }

@@ -11,14 +11,14 @@ import java.util.List;
 
 public class AppointmentServiceImpl implements AppointmentService {
 
-    // Connect to your DAO
     private AppointmentDAO appointmentDAO = new AppointmentDAOImpl();
 
-    // 1. Matches the AppointmentService interface requirement!
+    // FIXED: Changed name from addAppointment to insertAppointment
     @Override
-    public boolean addAppointment(Appointment appointment) throws DatabaseException {
+    public boolean insertAppointment(Appointment appointment) throws DatabaseException {
 
         // Validation Rules
+        // Note: Make sure these getter names match your Appointment model (e.g., getUserId vs getUserID)
         if (appointment.getUserID() <= 0) {
             System.out.println("\tX Validation Error: Appointment must be linked to a valid User ID.");
             return false;
@@ -44,7 +44,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             return false;
         }
 
-        // 2. Matches your actual AppointmentDAO method name!
+        // Passes it to the DAO
         return appointmentDAO.insertAppointment(appointment);
     }
 

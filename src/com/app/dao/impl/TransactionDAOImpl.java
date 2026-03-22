@@ -2,7 +2,7 @@ package com.app.dao.impl;
 
 import com.app.dao.TransactionDAO;
 import com.app.model.Transaction;
-import com.app.util.DbConnection; // Using your connection utility!
+import com.app.util.DbConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,6 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     public boolean addTransaction(Transaction transaction) {
-        // Skipping transaction_id and transaction_datetime so MySQL can auto-generate them
         String sql = "INSERT INTO tbltransactions (procedure_id, user_id, service_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbConnection.connect();
@@ -46,26 +45,51 @@ public class TransactionDAOImpl implements TransactionDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Transaction transaction = new Transaction();
-
-                transaction.setTransactionId(rs.getInt("transaction_id"));
-                transaction.setProcedureId(rs.getInt("procedure_id")); // or process_id if unchanged in DB
-                transaction.setUserId(rs.getInt("user_id"));
-                transaction.setServiceId(rs.getInt("service_id"));
-                transaction.setMedicineId(rs.getInt("medicine_id"));
-                transaction.setQuantity(rs.getInt("quantity"));
-                transaction.setTotalAmount(rs.getInt("total_amount"));
-                transaction.setIsPaid(rs.getInt("is_paid"));
-
-                // Read the datetime from the database as a String
-                transaction.setTransactionDateTime(rs.getString("transaction_datetime"));
-
+                Transaction transaction = mapResultSetToTransaction(rs);
                 transactionList.add(transaction);
             }
         } catch (Exception e) {
             System.out.println("Error retrieving transactions: " + e.getMessage());
         }
         return transactionList;
+    }
+
+    // FIXED: Added the missing method required by the Interface
+    @Override
+    public List<Transaction> getUserTransactions(int userId) {
+        List<Transaction> transactionList = new ArrayList<>();
+        String sql = "SELECT * FROM tbltransactions WHERE user_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Transaction transaction = mapResultSetToTransaction(rs);
+                    transactionList.add(transaction);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving user transactions: " + e.getMessage());
+        }
+        return transactionList;
+    }
+
+    // Helper method to avoid repeating the "rs.get..." code twice
+    private Transaction mapResultSetToTransaction(ResultSet rs) throws java.sql.SQLException {
+        Transaction t = new Transaction();
+        t.setTransactionId(rs.getInt("transaction_id"));
+        t.setProcedureId(rs.getInt("procedure_id"));
+        t.setUserId(rs.getInt("user_id"));
+        t.setServiceId(rs.getInt("service_id"));
+        t.setMedicineId(rs.getInt("medicine_id"));
+        t.setQuantity(rs.getInt("quantity"));
+        t.setTotalAmount(rs.getInt("total_amount"));
+        t.setIsPaid(rs.getInt("is_paid"));
+        t.setTransactionDateTime(rs.getString("transaction_datetime"));
+        return t;
     }
 
     @Override
@@ -81,5 +105,21 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public boolean deleteTransaction(int transactionId) {
         return false; // TODO: Implement later
+    }
+
+    @Override
+    public boolean payTransaction(int transactionId) {
+        // Sets is_paid to 1
+        String sql = "UPDATE tbltransactions SET is_paid = 1 WHERE transaction_id = ?";
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, transactionId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.out.println("Error processing payment: " + e.getMessage());
+        }
+        return false;
     }
 }

@@ -73,72 +73,54 @@ public class TransactionView {
 
     // VIEW USER TRANSACTIONS
     private void viewUserTransactions(User user) {
-        try {
-            List<Transaction> list = transactionService.getUserTransactions(user.getUserId());
+        List<Transaction> list = transactionService.getUserTransactions(user.getUserId());
 
-            System.out.println("\n===== MY TRANSACTIONS =====");
+        System.out.println("\n\t===== MY TRANSACTIONS =====");
 
-            if (list.isEmpty()) {
-                System.out.println("No transactions found.");
-                return;
-            }
+        if (list.isEmpty()) {
+            System.out.println("\tNo transactions found.");
+            return;
+        }
 
-            for (Transaction t : list) {
-                System.out.println("ID: " + t.getTransactionId());
-                System.out.println("Procedure ID: " + t.getProcedureId());
-                System.out.println("Service ID: " + t.getServiceId());
-                System.out.println("Medicine ID: " + t.getMedicineId());
-                System.out.println("Quantity: " + t.getQuantity());
-                System.out.println("Total: " + t.getTotalAmount());
-                System.out.println("Status: " + getStatus(t.getIsPaid()));
-                System.out.println("--------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        for (Transaction t : list) {
+            System.out.println("\tID: " + t.getTransactionId());
+            System.out.println("\tTotal: ₱" + t.getTotalAmount());
+            System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
+            System.out.println("\tDate: " + t.getTransactionDateTime());
+            System.out.println("\t--------------------------");
         }
     }
 
     // VIEW ALL (ADMIN)
     private void viewAllTransactions() {
-        try {
-            List<Transaction> list = transactionService.getAllTransactions();
+        List<Transaction> list = transactionService.getAllTransactions();
 
-            System.out.println("\n===== ALL TRANSACTIONS =====");
+        System.out.println("\n\t===== ALL TRANSACTIONS =====");
 
-            if (list.isEmpty()) {
-                System.out.println("No transactions found.");
-                return;
-            }
+        if (list.isEmpty()) {
+            System.out.println("\tNo transactions found.");
+            return;
+        }
 
-            for (Transaction t : list) {
-                System.out.println("ID: " + t.getTransactionId());
-                System.out.println("User ID: " + t.getUserId());
-                System.out.println("Total: " + t.getTotalAmount());
-                System.out.println("Status: " + getStatus(t.getIsPaid()));
-                System.out.println("--------------------------");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        for (Transaction t : list) {
+            System.out.println("\tID: " + t.getTransactionId());
+            System.out.println("\tUser ID: " + t.getUserId());
+            System.out.println("\tTotal: ₱" + t.getTotalAmount());
+            System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
+            System.out.println("\t--------------------------");
         }
     }
 
     // PAY TRANSACTION
     private void payTransaction() {
-        try {
-            int id = InputUtil.getInt("Enter Transaction ID to pay: ");
+        int id = InputUtil.getInt("\tEnter Transaction ID to pay: ");
 
-            boolean success = transactionService.payTransaction(id);
+        boolean success = transactionService.payTransaction(id);
 
-            if (success) {
-                System.out.println("Payment successful!");
-            } else {
-                System.out.println("Payment failed.");
-            }
-
-        } catch (DatabaseException e) {
-            System.out.println("Database error: " + e.getMessage());
+        if (success) {
+            System.out.println("\t-> Payment successful! Thank you.");
+        } else {
+            System.out.println("\tX Payment failed. Please check the Transaction ID.");
         }
     }
 
