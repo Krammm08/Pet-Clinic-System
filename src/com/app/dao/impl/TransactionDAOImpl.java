@@ -79,7 +79,8 @@ public class TransactionDAOImpl implements TransactionDAO {
 
                 // ---> THIS IS THE MISSING LINE THAT CAUSED "Service #0" <---
                 t.setServiceId(rs.getInt("service_id"));
-
+// Notice the change to "transaction_datetime"
+                t.setTransactionDateTime(rs.getString("transaction_datetime"));
                 t.setTotalAmount(rs.getDouble("total_amount"));
                 t.setIsPaid(rs.getInt("is_paid"));
                 transactions.add(t);
@@ -117,8 +118,9 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public boolean payTransaction(int transactionId) {
         // Sets is_paid to 1
-        String sql = "UPDATE tbltransactions SET is_paid = 1 WHERE transaction_id = ?";
-        try (Connection conn = DbConnection.connect();
+        // Assuming you named the column 'transaction_date' in phpMyAdmin
+// Notice the change to "transaction_datetime = CURRENT_TIMESTAMP"
+        String sql = "UPDATE tbltransactions SET is_paid = 1, transaction_datetime = CURRENT_TIMESTAMP WHERE transaction_id = ?";        try (Connection conn = DbConnection.connect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, transactionId);

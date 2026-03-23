@@ -98,33 +98,35 @@ public class PetDAOImpl implements PetDAO {
 
     @Override
     public Pet getPetById(int petId) {
-        Pet pet = null;
-        // IMPORTANT: Make sure 'pet_id' matches your XAMPP column name!
         String sql = "SELECT * FROM tblpets WHERE pet_id = ?";
-
         try (Connection conn = DbConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, petId);
             ResultSet rs = stmt.executeQuery();
-
             if (rs.next()) {
-                pet = new Pet();
+                Pet pet = new Pet();
                 pet.setPetId(rs.getInt("pet_id"));
-                pet.setUserId(rs.getInt("user_id"));
-                pet.setPetName(rs.getString("name"));
-                // ... set other fields like breed, age, etc.
+
+                // ---> THIS IS THE FIX: Changed "name" to "pet_name" <---
+                pet.setPetName(rs.getString("pet_name"));
+
+                pet.setAnimalType(rs.getString("animal_type"));
+                pet.setBreed(rs.getString("breed"));
+                pet.setAge(rs.getInt("age"));
+                pet.setGender(rs.getString("gender"));
+                pet.setWeightKg(rs.getInt("weights_kg"));
+                return pet;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("\tX DAO Error: " + e.getMessage());
         }
-        return pet; // If this returns NULL, you get the "Pet not found" error
+        return null;
     }
 
     @Override
     public boolean updatePet(Pet pet) {
-        // Ensure these column names match your XAMPP 'tblpets' exactly!
-        String sql = "UPDATE tblpets SET name = ?, type = ?, breed = ?, age = ?, gender = ?, weight = ? WHERE pet_id = ?";
+        // ---> THIS IS THE FIX: Changed "name = ?" to "pet_name = ?" <---
+        String sql = "UPDATE tblpets SET pet_name = ?, animal_type = ?, breed = ?, age = ?, gender = ?, weights_kg = ? WHERE pet_id = ?";
 
         try (Connection conn = DbConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -135,10 +137,10 @@ public class PetDAOImpl implements PetDAO {
             stmt.setInt(4, pet.getAge());
             stmt.setString(5, pet.getGender());
             stmt.setDouble(6, pet.getWeightKg());
-            stmt.setInt(7, pet.getPetId()); // The ID tells SQL WHICH pet to change
+            stmt.setInt(7, pet.getPetId());
 
             int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0; // Returns true if the pet was actually found and updated
+            return rowsUpdated > 0;
 
         } catch (SQLException e) {
             System.out.println("\tX Database Error during update: " + e.getMessage());

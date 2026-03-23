@@ -18,7 +18,7 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         String sqlTrans = "INSERT INTO tbltransactions (user_id, service_id, procedure_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, 1, 0, ?, 0)";
 
         // NEW: SQL to get the actual service price
-        String sqlPrice = "SELECT price FROM tblofferedservices WHERE service_id = ?";
+        String sqlPrice = "SELECT service_fee FROM tblofferedservices WHERE service_id = ?";
 
         Connection conn = null;
         try {
@@ -33,7 +33,7 @@ public class AppointmentDAOImpl implements AppointmentDAO {
                 stmtPrice.setInt(1, appointment.getServiceID());
                 ResultSet rsPrice = stmtPrice.executeQuery();
                 if (rsPrice.next()) {
-                    actualPrice = rsPrice.getDouble("price");
+                    actualPrice = rsPrice.getDouble("service_fee");
                 } else {
                     actualPrice = 500.0; // Fallback just in case
                 }
@@ -174,9 +174,6 @@ public class AppointmentDAOImpl implements AppointmentDAO {
         }
     }
 
-    // --- HELPER METHOD ---
-    // Instead of copying and pasting the ResultSet extraction 3 times,
-    // a private helper method keeps your code clean and professional!
     private Appointment extractAppointmentFromResultSet(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setAppointmentID(rs.getInt("appointment_id"));

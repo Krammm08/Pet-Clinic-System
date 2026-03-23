@@ -83,10 +83,13 @@ public class TransactionView {
         }
 
         for (Transaction t : list) {
+            // --- NEW LOGIC: Check if the date is null before printing ---
+            String dateStr = (t.getTransactionDateTime() != null) ? t.getTransactionDateTime() : "Not Paid Yet";
+
             System.out.println("\tID: " + t.getTransactionId());
             System.out.println("\tTotal: ₱" + t.getTotalAmount());
             System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
-            System.out.println("\tDate: " + t.getTransactionDateTime());
+            System.out.println("\tDate: " + dateStr); // Prints the date or "Not Paid Yet"
             System.out.println("\t--------------------------");
         }
     }
@@ -103,10 +106,14 @@ public class TransactionView {
         }
 
         for (Transaction t : list) {
+            // --- NEW LOGIC: Do the same check for the admin view ---
+            String dateStr = (t.getTransactionDateTime() != null) ? t.getTransactionDateTime() : "Not Paid Yet";
+
             System.out.println("\tID: " + t.getTransactionId());
             System.out.println("\tUser ID: " + t.getUserId());
             System.out.println("\tTotal: ₱" + t.getTotalAmount());
             System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
+            System.out.println("\tDate: " + dateStr); // Admin can now see the date too!
             System.out.println("\t--------------------------");
         }
     }
