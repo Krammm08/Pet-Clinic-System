@@ -11,6 +11,7 @@ public class Procedure {
     private String diagnosis;
     private int medicineId;
     private String procedureDate;
+    private String medicineName;
 
     // Default Constructor
     public Procedure() {
@@ -102,5 +103,12 @@ public class Procedure {
 
     public void setProcedureDate(String procedureDate) {
         this.procedureDate = procedureDate;
+    }
+    public String getMedicineName() {
+        return medicineName;
+    }
+
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
     }
 }

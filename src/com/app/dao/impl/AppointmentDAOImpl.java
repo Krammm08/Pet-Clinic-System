@@ -208,18 +208,28 @@ public class AppointmentDAOImpl implements AppointmentDAO {
     }
     @Override
     public boolean updateAppointmentStatus(int appointmentId, String status) throws DatabaseException {
-        // Notice I am guessing your column is named 'is_approve' based on your getter method.
-        // If your database column is named 'status', change 'is_approve' to 'status' in the SQL string!
+
+        // --- THE FIX: Translate the String into the Database Integer ---
+        int statusInt = 0; // Default to Pending
+        if (status.equalsIgnoreCase("Approved")) {
+            statusInt = 1;
+        } else if (status.equalsIgnoreCase("Declined")) {
+            statusInt = 2;
+        } else if (status.equalsIgnoreCase("Completed")) {
+            statusInt = 3;
+        }
+
         String sql = "UPDATE tblappointments SET is_approve = ? WHERE appointment_id = ?";
 
         try (Connection conn = DbConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, status);
+            // Pass the translated INTEGER (statusInt) instead of the String (status)
+            stmt.setInt(1, statusInt);
             stmt.setInt(2, appointmentId);
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Returns true if the database was successfully updated
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
 
         } catch (SQLException e) {
             throw new DatabaseException("Error updating appointment status: " + e.getMessage());

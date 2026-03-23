@@ -17,20 +17,21 @@ public class ProcedureView {
     public void show() {
 
         while (true) {
-            System.out.println("\n\t========== PROCEDURE MANAGEMENT ==========");
-            System.out.println("\t|\t1. Create Procedure");
-            System.out.println("\t|\t2. View All Procedures");
+            System.out.println("\t========== PROCEDURE MANAGEMENT ==========");
+            System.out.println("\t|\t1. View All Procedures");
+            System.out.println("\t|\t2. Update Diagnosis & Prescribe Medicine");
             System.out.println("\t|\t3. Back");
             System.out.println("\t==========================================");
+            // Note: Adjust your switch(choice) to point option 2 to the new method below!
             int choice = InputUtil.getInt("\tChoose option: ");
             System.out.println("\t==========================================\n");
 
             switch (choice) {
                 case 1:
-                    createProcedure();
+                    viewProcedures();
                     break;
                 case 2:
-                    viewProcedures();
+                    updateProcedure();
                     break;
                 case 3:
                     return;
@@ -84,10 +85,33 @@ public class ProcedureView {
             System.out.println("\tPet ID: " + p.getPetId());
             System.out.println("\tVet ID: " + p.getVetId());
             System.out.println("\tService ID: " + p.getServiceId());
-            System.out.println("\tMedicine ID: " + p.getMedicineId());
+            System.out.println("\tMedicine: " + p.getMedicineName());
             System.out.println("\tDiagnosis: " + p.getDiagnosis());
             System.out.println("\tDate: " + p.getProcedureDate());
             System.out.println("\t---------------------------");
+        }
+    }
+    private void updateProcedure() {
+        System.out.println("\n\t--- UPDATE DIAGNOSIS & PRESCRIBE ---");
+
+        int procedureId = InputUtil.getInt("\tEnter Procedure ID to update: ");
+        String diagnosis = InputUtil.getString("\tEnter Vet's Diagnosis (e.g., 'Severe Flea Infection'): ");
+
+        System.out.println("\n\t[Tip: Enter '1' if no medicine is needed]");
+        int medicineId = InputUtil.getInt("\tEnter Prescribed Medicine ID: ");
+
+        System.out.println("\tProcessing medical record and updating billing...");
+
+        // Call the super-method we just built!
+        boolean success = procedureService.updateProcedureAndBill(procedureId, diagnosis, medicineId);
+
+        if (success) {
+            System.out.println("\t-> SUCCESS! Medical record updated.");
+            if (medicineId != 1) {
+                System.out.println("\t-> Medicine dispensed. Cost has been added to the customer's bill.");
+            }
+        } else {
+            System.out.println("\tX Failed to update procedure.");
         }
     }
 }

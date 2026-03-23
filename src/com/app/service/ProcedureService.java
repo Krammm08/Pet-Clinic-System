@@ -9,4 +9,6 @@ public interface ProcedureService {
     Procedure getProcedureById(int procedureId);
     boolean updateProcedure(Procedure procedure);
     boolean deleteProcedure(int procedureId);
+    // Add this inside ProcedureServiceImpl.java
+    public boolean updateProcedureAndBill(int procedureId, String diagnosis, int medicineId);
 }

@@ -83,4 +83,8 @@ public class ProcedureServiceImpl implements ProcedureService {
         }
         return procedureDAO.deleteProcedure(procedureId);
     }
+    @Override
+    public boolean updateProcedureAndBill(int procedureId, String diagnosis, int medicineId) {
+    return procedureDAO.updateProcedureAndBill(procedureId, diagnosis, medicineId);
+    }
 }

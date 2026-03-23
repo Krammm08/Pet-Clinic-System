@@ -9,4 +9,5 @@ public interface ProcedureDAO {
     Procedure getProcedureById(int procedureId);
     boolean updateProcedure(Procedure procedure);
     boolean deleteProcedure(int procedureId);
+    boolean updateProcedureAndBill(int procedureId, String diagnosis, int medicineId);
 }
