@@ -48,13 +48,13 @@ public class TransactionView {
 
     // ADMIN SIDE
     public void adminMenu() {
-
         while (true) {
-            System.out.println("\n===== ALL TRANSACTIONS =====");
-            System.out.println("1. View All Transactions");
-            System.out.println("2. Back");
+            System.out.println("\n\t====== TRANSACTION MENU ======");
+            System.out.println("\t|\t1. View All Transactions");
+            System.out.println("\t|\t2. Back");
+            System.out.println("\t==============================");
 
-            int choice = InputUtil.getInt("Choose option: ");
+            int choice = InputUtil.getInt("\tChoose option: ");
 
             switch (choice) {
 
@@ -83,13 +83,13 @@ public class TransactionView {
         }
 
         for (Transaction t : list) {
-            // --- NEW LOGIC: Check if the date is null before printing ---
             String dateStr = (t.getTransactionDateTime() != null) ? t.getTransactionDateTime() : "Not Paid Yet";
 
             System.out.println("\tID: " + t.getTransactionId());
+            System.out.println("\tService: " + t.getServiceName()); // <-- NEW LINE ADDED HERE
             System.out.println("\tTotal: ₱" + t.getTotalAmount());
             System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
-            System.out.println("\tDate: " + dateStr); // Prints the date or "Not Paid Yet"
+            System.out.println("\tDate: " + dateStr);
             System.out.println("\t--------------------------");
         }
     }
@@ -106,14 +106,14 @@ public class TransactionView {
         }
 
         for (Transaction t : list) {
-            // --- NEW LOGIC: Do the same check for the admin view ---
             String dateStr = (t.getTransactionDateTime() != null) ? t.getTransactionDateTime() : "Not Paid Yet";
 
             System.out.println("\tID: " + t.getTransactionId());
-            System.out.println("\tUser ID: " + t.getUserId());
+            // This now prints "Maaark (Vaccination)" instead of just "User ID: 3"
+            System.out.println("\tCustomer: " + t.getServiceName());
             System.out.println("\tTotal: ₱" + t.getTotalAmount());
             System.out.println("\tStatus: " + getStatus(t.getIsPaid()));
-            System.out.println("\tDate: " + dateStr); // Admin can now see the date too!
+            System.out.println("\tDate: " + dateStr);
             System.out.println("\t--------------------------");
         }
     }
@@ -139,13 +139,15 @@ public class TransactionView {
                 return;
             }
 
-            // 3. Display the detailed bill list
+            // Display the detailed bill list
             System.out.println("\n\t--- YOUR UNPAID BILLS ---");
-            System.out.println("\tID\tService ID\tAmount\t\tStatus");
+            System.out.println("\tID\tService\t\tAmount\t\tStatus");
             System.out.println("\t--------------------------------------------------");
             for (Transaction t : unpaidBills) {
-                System.out.println("\t[" + t.getTransactionId() + "]\tService #" + t.getServiceId()
-                        + "\tPhp " + t.getTotalAmount() + "\t[PENDING]");
+                // Notice it now says t.getServiceName() instead of "Service #" + t.getServiceId()
+                System.out.println("\t[" + t.getTransactionId() + "]\t"
+                        + t.getServiceName() + "\t\t"
+                        + "Php " + t.getTotalAmount() + "\t[PENDING]");
             }
             System.out.println("\t--------------------------------------------------");
 

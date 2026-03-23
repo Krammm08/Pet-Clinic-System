@@ -104,21 +104,42 @@ public class AppointmentDAOImpl implements AppointmentDAO {
 
     @Override
     public List<Appointment> getAllAppointments() throws DatabaseException {
-        List<Appointment> appointmentList = new ArrayList<>();
-        String sql = "SELECT * FROM tblappointments";
+        List<Appointment> list = new ArrayList<>();
+
+        // --- THE INNER JOIN MEGA-QUERY ---
+        // 'a' is tblappointments, 'u' is tblusers, 'p' is tblpets, 's' is tblofferedservices
+// 1. UPDATE THE SQL STRING (Change to s.service_type)
+        String sql = "SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.is_approve, " +
+                "u.username, p.pet_name, s.service_type " +
+                "FROM tblappointments a " +
+                "INNER JOIN tblusers u ON a.user_id = u.user_id " +
+                "INNER JOIN tblpets p ON a.pet_id = p.pet_id " +
+                "INNER JOIN tblofferedservices s ON a.service_id = s.service_id";
 
         try (Connection conn = DbConnection.connect();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Appointment appointment = extractAppointmentFromResultSet(rs);
-                appointmentList.add(appointment);
+                Appointment app = new Appointment();
+                app.setAppointmentID(rs.getInt("appointment_id"));
+                app.setAppointmentDate(rs.getDate("appointment_date"));
+                app.setAppointmentTime(rs.getTime("appointment_time"));
+                app.setIsApprove(rs.getInt("is_approve"));
+
+                app.setOwnerName(rs.getString("username"));
+                app.setPetName(rs.getString("pet_name"));
+
+                // 2. UPDATE THE FETCH LINE (Change to service_type)
+                app.setServiceName(rs.getString("service_type"));
+
+                list.add(app);
             }
+            // ... rest of method ...
         } catch (SQLException e) {
-            throw new DatabaseException("Failed to retrieve all appointments: " + e.getMessage());
+            System.out.println("X Admin Fetch Error: " + e.getMessage());
         }
-        return appointmentList;
+        return list;
     }
 
     @Override

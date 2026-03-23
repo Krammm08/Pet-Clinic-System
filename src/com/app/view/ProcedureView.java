@@ -77,7 +77,6 @@ public class ProcedureView {
             System.out.println("\tNo procedures found.");
             return;
         }
-
         for (Procedure p : list) {
             System.out.println("\tProcedure ID: " + p.getProcedureId());
             System.out.println("\tAppointment ID: " + p.getAppointmentId());

@@ -38,21 +38,37 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     @Override
     public List<Transaction> getAllTransactions() {
-        List<Transaction> transactionList = new ArrayList<>();
-        String sql = "SELECT * FROM tbltransactions";
+        List<Transaction> transactions = new ArrayList<>();
+
+        // INNER JOIN to get the Username and the Service Type
+        String sql = "SELECT t.transaction_id, t.user_id, t.total_amount, t.is_paid, t.transaction_datetime, " +
+                "u.username, s.service_type " +
+                "FROM tbltransactions t " +
+                "INNER JOIN tblusers u ON t.user_id = u.user_id " +
+                "INNER JOIN tblofferedservices s ON t.service_id = s.service_id";
 
         try (Connection conn = DbConnection.connect();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Transaction transaction = mapResultSetToTransaction(rs);
-                transactionList.add(transaction);
+                Transaction t = new Transaction();
+                t.setTransactionId(rs.getInt("transaction_id"));
+                t.setUserId(rs.getInt("user_id"));
+                t.setTotalAmount(rs.getDouble("total_amount"));
+                t.setIsPaid(rs.getInt("is_paid"));
+                t.setTransactionDateTime(rs.getString("transaction_datetime"));
+
+                // Reusing the serviceName variable to hold the Username for the Admin view temporarily!
+                // (Or you can add a 'userName' string variable to your Transaction model!)
+                t.setServiceName(rs.getString("username") + " (" + rs.getString("service_type") + ")");
+
+                transactions.add(t);
             }
-        } catch (Exception e) {
-            System.out.println("Error retrieving transactions: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Error fetching all transactions: " + e.getMessage());
         }
-        return transactionList;
+        return transactions;
     }
 
     @Override
@@ -64,8 +80,12 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public List<Transaction> getUserTransactions(int userId) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM tbltransactions WHERE user_id = ?";
 
+        String sql = "SELECT t.transaction_id, t.user_id, t.service_id, t.total_amount, " +
+                "t.is_paid, t.transaction_datetime, s.service_type " +
+                "FROM tbltransactions t " +
+                "INNER JOIN tblofferedservices s ON t.service_id = s.service_id " +
+                "WHERE t.user_id = ?";
         try (Connection conn = DbConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -76,14 +96,13 @@ public class TransactionDAOImpl implements TransactionDAO {
                 Transaction t = new Transaction();
                 t.setTransactionId(rs.getInt("transaction_id"));
                 t.setUserId(rs.getInt("user_id"));
-
-                // ---> THIS IS THE MISSING LINE THAT CAUSED "Service #0" <---
                 t.setServiceId(rs.getInt("service_id"));
-// Notice the change to "transaction_datetime"
-                t.setTransactionDateTime(rs.getString("transaction_datetime"));
                 t.setTotalAmount(rs.getDouble("total_amount"));
                 t.setIsPaid(rs.getInt("is_paid"));
-                transactions.add(t);
+                t.setTransactionDateTime(rs.getString("transaction_datetime"));
+                t.setServiceName(rs.getString("service_type"));
+
+                transactions.add(t); // (Make sure you don't forget this line to add it to the list!)
             }
         } catch (SQLException e) {
             System.out.println("Error fetching transactions: " + e.getMessage());

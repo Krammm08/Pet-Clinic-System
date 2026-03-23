@@ -11,6 +11,7 @@ public class Transaction {
     private double totalAmount;
     private int isPaid;
     private String transactionDateTime;
+    private String serviceName;
 
     // Default Constructor
     public Transaction() {
@@ -109,5 +110,13 @@ public class Transaction {
 
     public String getPaymentStatus() {
         return isPaid == 1 ? "PAID" : "PENDING";
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 }

@@ -171,14 +171,16 @@ public class AppointmentView {
                 return;
             }
 
-            System.out.println("\tID\tPet ID\tDate\t\tTime\tStatus");
-            System.out.println("\t---------------------------------------------------------");
+            System.out.println("\tID\tOwner\t\tPet\t\tService\t\tDate\t\tTime\tStatus");
+            System.out.println("\t--------------------------------------------------------------------------------------------------");
             for (Appointment app : allAppointments) {
                 System.out.println("\t[" + app.getAppointmentID() + "]\t"
-                        + app.getPetID() + "\t"
+                        + app.getOwnerName() + "\t\t"
+                        + app.getPetName() + "\t\t"
+                        + app.getServiceName() + "\t"
                         + app.getAppointmentDate() + "\t"
                         + app.getAppointmentTime() + "\t"
-                        + "[" + app.getIsApprove() + "]");
+                        + "[" + getStatusText(app.getIsApprove()) + "]"); // Uses the text helper we made earlier!
             }
         } catch (DatabaseException e) {
             System.out.println("\tX Error loading appointments: " + e.getMessage());

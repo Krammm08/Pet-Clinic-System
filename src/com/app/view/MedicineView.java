@@ -44,20 +44,20 @@ public class MedicineView {
 
         // No try-catch needed here because the DAO handles exceptions internally!
         List<Medicine> list = medDAO.getAllMedicines();
-
-        System.out.println("\n===== ALL MEDICINES =====");
-
         if (list.isEmpty()) {
             System.out.println("No medicines found in the inventory."); // Fixed text
             return;
         }
 
-        for (Medicine med : list) {
-            System.out.println("Medicine ID: " + med.getMedicineId());
-            System.out.println("Medicine Name: " + med.getMedName()); // Fixed typo
-            System.out.println("Price: ₱" + med.getCost()); // Added peso sign for style
-            System.out.println("Inventory Count: " + med.getInventoryCount());
-            System.out.println("--------------------------");
+        System.out.println("\n\t===== ALL MEDICINES =====");
+        for (Medicine m : list) {
+            System.out.println("\tMedicine ID: " + m.getMedicineId());
+            System.out.println("\tMedicine Name: " + m.getMedName());
+            System.out.println("\tPrice: ₱" + m.getCost());
+            System.out.println("\tInventory Count: " + m.getInventoryCount());
+            System.out.println("\t--------------------------");
         }
+
+
     }
 }

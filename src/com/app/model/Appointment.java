@@ -11,6 +11,9 @@ public class Appointment {
     private Date appointmentDate;
     private Time appointmentTime;
     private int isApprove;
+    private String ownerName;
+    private String petName;
+    private String serviceName;
 
     public Appointment(){}
 
@@ -34,4 +37,13 @@ public class Appointment {
 
     public int getIsApprove() {return isApprove;}
     public void setIsApprove(int isApprove) {this.isApprove = isApprove;}
+
+    public String getOwnerName() { return ownerName; }
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+
+    public String getPetName() { return petName; }
+    public void setPetName(String petName) { this.petName = petName; }
+
+    public String getServiceName() { return serviceName; }
+    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
 }
