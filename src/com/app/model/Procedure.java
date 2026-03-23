@@ -12,6 +12,10 @@ public class Procedure {
     private int medicineId;
     private String procedureDate;
     private String medicineName;
+    private String ownerName;
+    private String petName;
+    private String vetName;
+    private String serviceName;
 
     // Default Constructor
     public Procedure() {
@@ -111,4 +115,16 @@ public class Procedure {
     public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
     }
+
+    public String getOwnerName() { return ownerName; }
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+
+    public String getPetName() { return petName; }
+    public void setPetName(String petName) { this.petName = petName; }
+
+    public String getVetName() { return vetName; }
+    public void setVetName(String vetName) { this.vetName = vetName; }
+
+    public String getServiceName() { return serviceName; }
+    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
 }

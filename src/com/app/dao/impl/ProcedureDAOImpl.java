@@ -41,31 +41,42 @@ public class ProcedureDAOImpl implements ProcedureDAO {
     public List<Procedure> getAllProcedures() {
         List<Procedure> list = new ArrayList<>();
 
-        String sql = "SELECT p.procedure_id, p.appointment_id, p.user_id, p.pet_id, p.vet_id, " +
-                "p.service_id, p.medicine_id, p.diagnosis, p.procedure_date, m.med_name " +
+        // --- THE MEGA JOIN SQL ---
+        // Joins 6 tables and filters for Approved Appointments (a.is_approve = 1)
+        String sql = "SELECT p.procedure_id, p.diagnosis, p.procedure_date, " +
+                "u.username, pt.pet_name, v.vet_name, s.service_type, m.med_name " +
                 "FROM tblprocedures p " +
-                "INNER JOIN tblmedicines m ON p.medicine_id = m.medicine_id";
+                "INNER JOIN tblappointments a ON p.appointment_id = a.appointment_id " +
+                "INNER JOIN tblusers u ON p.user_id = u.user_id " +
+                "INNER JOIN tblpets pt ON p.pet_id = pt.pet_id " +
+                "INNER JOIN tblvets v ON p.vet_id = v.vet_id " +
+                "INNER JOIN tblofferedservices s ON p.service_id = s.service_id " +
+                "INNER JOIN tblmedicines m ON p.medicine_id = m.medicine_id " +
+                "WHERE a.is_approve = 1";
+
         try (Connection conn = DbConnection.connect();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Procedure p = new Procedure();
+
+                // We only need the Procedure ID for the system to work
                 p.setProcedureId(rs.getInt("procedure_id"));
-                p.setAppointmentId(rs.getInt("appointment_id"));
-                p.setUserId(rs.getInt("user_id"));
-                p.setPetId(rs.getInt("pet_id"));
-                p.setVetId(rs.getInt("vet_id"));
-                p.setServiceId(rs.getInt("service_id"));
-                p.setMedicineId(rs.getInt("medicine_id"));
                 p.setDiagnosis(rs.getString("diagnosis"));
                 p.setProcedureDate(rs.getString("procedure_date"));
+
+                // --- THE BEAUTIFUL TEXT DATA ---
+                p.setOwnerName(rs.getString("username"));
+                p.setPetName(rs.getString("pet_name"));
+                p.setVetName(rs.getString("vet_name"));
+                p.setServiceName(rs.getString("service_type"));
                 p.setMedicineName(rs.getString("med_name"));
 
                 list.add(p);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching procedures: " + e.getMessage());
+            System.out.println("\tX Error fetching procedures: " + e.getMessage());
         }
         return list;
     }
