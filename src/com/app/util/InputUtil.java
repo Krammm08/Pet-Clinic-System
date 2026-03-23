@@ -17,22 +17,32 @@ public class InputUtil {
         return input;
     }
 
-    // NEW: Number reader that prevents crashes!
+    // Replace your current getInt method with this one:
     public static int getInt(String prompt) {
-        int input = -1;
-        boolean valid = false;
-        while (!valid) {
+        while (true) {
             System.out.print(prompt);
             try {
-                input = Integer.parseInt(scanner.nextLine().trim());
-                valid = true;
+                // We read the whole line as a string, then try to convert it to a number
+                return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("\tX Invalid input. Please enter a valid number.");
+                // If they typed letters, it fails gracefully and asks again!
+                System.out.println("\t[!] Invalid input. Please enter a valid number.");
             }
         }
-
-        return input;
     }
+
+    // You can do the exact same thing for getDouble!
+    public static double getDouble(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Double.parseDouble(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("\t[!] Invalid input. Please enter a valid decimal number.");
+            }
+        }
+    }
+
     public static String getString(String prompt) {
         System.out.print(prompt);
         // If you are using a static Scanner named 'scanner', use it here.

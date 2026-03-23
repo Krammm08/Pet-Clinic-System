@@ -175,7 +175,17 @@ public class TransactionView {
             if (confirm.equalsIgnoreCase("Y")) {
                 boolean success = transactionService.payTransaction(transId);
                 if (success) {
-                    System.out.println("\t-> Payment successful! Your appointment is now cleared.");
+                    // --- NEW: ASCII RECEIPT ---
+                    System.out.println("\n\t======================================");
+                    System.out.println("\t          PET CLINIC RECEIPT          ");
+                    System.out.println("\t======================================");
+                    System.out.println("\t Transaction ID : " + transId);
+                    System.out.println("\t Service ID     : " + selectedBill.getServiceId());
+                    System.out.println("\t Amount Paid    : Php " + selectedBill.getTotalAmount());
+                    System.out.println("\t Status         : PAID");
+                    System.out.println("\t--------------------------------------");
+                    System.out.println("\t  Thank you for trusting Pet Clinic!  ");
+                    System.out.println("\t======================================\n");
                 } else {
                     System.out.println("\tX Payment failed in database.");
                 }

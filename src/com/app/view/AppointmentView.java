@@ -149,11 +149,12 @@ public class AppointmentView {
 
             System.out.println("\tID\tDate\t\tTime\tStatus");
             System.out.println("\t--------------------------------------------------");
+            // Update this block inside viewUserAppointments:
             for (Appointment app : myAppointments) {
                 System.out.println("\t[" + app.getAppointmentID() + "]\t"
                         + app.getAppointmentDate() + "\t"
                         + app.getAppointmentTime() + "\t"
-                        + "[" + app.getIsApprove() + "]");
+                        + "[" + getStatusText(app.getIsApprove()) + "]"); // <-- CHANGED HERE
             }
         } catch (DatabaseException e) {
             System.out.println("\tX Error loading appointments: " + e.getMessage());
@@ -211,6 +212,16 @@ public class AppointmentView {
             }
         } catch (DatabaseException e) {
             System.out.println("\tX Database Error: " + e.getMessage());
+        }
+    }
+    // --- NEW HELPER METHOD ---
+    private String getStatusText(int status) {
+        switch (status) {
+            case 0: return "PENDING";
+            case 1: return "APPROVED";
+            case 2: return "DECLINED";
+            case 3: return "COMPLETED";
+            default: return "UNKNOWN";
         }
     }
 }
