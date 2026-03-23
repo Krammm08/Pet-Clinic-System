@@ -7,6 +7,7 @@ import com.app.util.DbConnection; // Using your connection utility
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,16 +98,70 @@ public class PetDAOImpl implements PetDAO {
 
     @Override
     public Pet getPetById(int petId) {
-        return null; // TODO: Implement later
+        Pet pet = null;
+        // IMPORTANT: Make sure 'pet_id' matches your XAMPP column name!
+        String sql = "SELECT * FROM tblpets WHERE pet_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, petId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                pet = new Pet();
+                pet.setPetId(rs.getInt("pet_id"));
+                pet.setUserId(rs.getInt("user_id"));
+                pet.setPetName(rs.getString("name"));
+                // ... set other fields like breed, age, etc.
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pet; // If this returns NULL, you get the "Pet not found" error
     }
 
     @Override
     public boolean updatePet(Pet pet) {
-        return false; // TODO: Implement later
+        // Ensure these column names match your XAMPP 'tblpets' exactly!
+        String sql = "UPDATE tblpets SET name = ?, type = ?, breed = ?, age = ?, gender = ?, weight = ? WHERE pet_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, pet.getPetName());
+            stmt.setString(2, pet.getAnimalType());
+            stmt.setString(3, pet.getBreed());
+            stmt.setInt(4, pet.getAge());
+            stmt.setString(5, pet.getGender());
+            stmt.setDouble(6, pet.getWeightKg());
+            stmt.setInt(7, pet.getPetId()); // The ID tells SQL WHICH pet to change
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // Returns true if the pet was actually found and updated
+
+        } catch (SQLException e) {
+            System.out.println("\tX Database Error during update: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public boolean deletePet(int petId) {
-        return false; // TODO: Implement later
+        String sql = "DELETE FROM tblpets WHERE pet_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, petId);
+
+            int rowsDeleted = stmt.executeUpdate();
+            return rowsDeleted > 0; // Returns true if the pet was successfully removed
+
+        } catch (SQLException e) {
+            // NOTE: This will fail if the pet is linked to an existing Appointment (Foreign Key)
+            System.out.println("\tX Cannot delete pet: It has existing appointments or medical records.");
+            return false;
+        }
     }
 }

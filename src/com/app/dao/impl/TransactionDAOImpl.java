@@ -64,7 +64,6 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public List<Transaction> getUserTransactions(int userId) {
         List<Transaction> transactions = new ArrayList<>();
-        // Ensure these names match your XAMPP columns exactly!
         String sql = "SELECT * FROM tbltransactions WHERE user_id = ?";
 
         try (Connection conn = DbConnection.connect();
@@ -76,13 +75,17 @@ public class TransactionDAOImpl implements TransactionDAO {
             while (rs.next()) {
                 Transaction t = new Transaction();
                 t.setTransactionId(rs.getInt("transaction_id"));
+                t.setUserId(rs.getInt("user_id"));
+
+                // ---> THIS IS THE MISSING LINE THAT CAUSED "Service #0" <---
+                t.setServiceId(rs.getInt("service_id"));
+
                 t.setTotalAmount(rs.getDouble("total_amount"));
                 t.setIsPaid(rs.getInt("is_paid"));
-                // ... set other fields ...
                 transactions.add(t);
             }
         } catch (SQLException e) {
-            System.out.println("\t[DEBUG] DAO Error: " + e.getMessage());
+            System.out.println("Error fetching transactions: " + e.getMessage());
         }
         return transactions;
     }

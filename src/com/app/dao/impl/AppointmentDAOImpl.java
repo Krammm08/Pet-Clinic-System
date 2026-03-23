@@ -13,24 +13,33 @@ public class AppointmentDAOImpl implements AppointmentDAO {
 
     @Override
     public void insertAppointment(Appointment appointment) throws DatabaseException {
-        // SQL 1: The Booking
         String sqlApp = "INSERT INTO tblappointments (pet_id, service_id, user_id, appointment_date, appointment_time, is_approve) VALUES (?, ?, ?, ?, ?, 0)";
-
-        // SQL 2: The Medical Link (Using Vet #1 and Medicine #0 placeholders)
         String sqlProc = "INSERT INTO tblprocedures (appointment_id, service_id, vet_id, user_id, pet_id, diagnosis, medicine_id, procedure_date) VALUES (?, ?, 1, ?, ?, 'Pending Exam', 1, ?)";
+        String sqlTrans = "INSERT INTO tbltransactions (user_id, service_id, procedure_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, 1, 0, ?, 0)";
 
-        // SQL 3: The Bill (Automatically set to 'is_paid = 0')
-        String sqlTrans = "INSERT INTO tbltransactions (user_id, service_id, procedure_id, medicine_id, quantity, total_amount, is_paid) VALUES (?, ?, ?, 0, 1, ?, 0)";
+        // NEW: SQL to get the actual service price
+        String sqlPrice = "SELECT price FROM tblofferedservices WHERE service_id = ?";
 
         Connection conn = null;
         try {
             conn = DbConnection.connect();
-            conn.setAutoCommit(false); // All three must succeed together
+            conn.setAutoCommit(false);
 
-            int generatedAppId = 0;
-            int generatedProcId = 0;
+            int generatedAppId = 0, generatedProcId = 0;
+            double actualPrice = 0.0; // Variable to hold the real price
 
-            // --- STEP 1: AUTO-SAVE APPOINTMENT ---
+            // --- NEW STEP: FETCH REAL PRICE ---
+            try (PreparedStatement stmtPrice = conn.prepareStatement(sqlPrice)) {
+                stmtPrice.setInt(1, appointment.getServiceID());
+                ResultSet rsPrice = stmtPrice.executeQuery();
+                if (rsPrice.next()) {
+                    actualPrice = rsPrice.getDouble("price");
+                } else {
+                    actualPrice = 500.0; // Fallback just in case
+                }
+            }
+
+            // --- STEP 1: APPOINTMENT ---
             try (PreparedStatement stmtApp = conn.prepareStatement(sqlApp, Statement.RETURN_GENERATED_KEYS)) {
                 stmtApp.setInt(1, appointment.getPetID());
                 stmtApp.setInt(2, appointment.getServiceID());
@@ -38,13 +47,11 @@ public class AppointmentDAOImpl implements AppointmentDAO {
                 stmtApp.setDate(4, appointment.getAppointmentDate());
                 stmtApp.setTime(5, appointment.getAppointmentTime());
                 stmtApp.executeUpdate();
-
                 ResultSet rs = stmtApp.getGeneratedKeys();
                 if (rs.next()) generatedAppId = rs.getInt(1);
-                System.out.println("[DEBUG] Appointment saved! ID: " + generatedAppId);
             }
 
-            // --- STEP 2: AUTO-SAVE PROCEDURE ---
+            // --- STEP 2: PROCEDURE ---
             try (PreparedStatement stmtProc = conn.prepareStatement(sqlProc, Statement.RETURN_GENERATED_KEYS)) {
                 stmtProc.setInt(1, generatedAppId);
                 stmtProc.setInt(2, appointment.getServiceID());
@@ -52,32 +59,23 @@ public class AppointmentDAOImpl implements AppointmentDAO {
                 stmtProc.setInt(4, appointment.getPetID());
                 stmtProc.setDate(5, appointment.getAppointmentDate());
                 stmtProc.executeUpdate();
-
                 ResultSet rs = stmtProc.getGeneratedKeys();
                 if (rs.next()) generatedProcId = rs.getInt(1);
-                System.out.println("[DEBUG] Procedure linked! ID: " + generatedProcId);
             }
 
-            // --- STEP 3: AUTO-SAVE TRANSACTION (THE BILL) ---
-            double totalAmount = 500.0; // Placeholder: Replace with service fee logic
+            // --- STEP 3: TRANSACTION ---
             try (PreparedStatement stmtTrans = conn.prepareStatement(sqlTrans)) {
                 stmtTrans.setInt(1, appointment.getUserID());
                 stmtTrans.setInt(2, appointment.getServiceID());
                 stmtTrans.setInt(3, generatedProcId);
-                stmtTrans.setDouble(4, totalAmount);
+                stmtTrans.setDouble(4, actualPrice); // Uses the real price now!
                 stmtTrans.executeUpdate();
-                System.out.println("[DEBUG] Transaction created! Status: UNPAID");
             }
 
-            conn.commit(); // Finalize all inserts
-            System.out.println("\t-> Full Booking Sequence Complete!");
+            conn.commit();
 
         } catch (SQLException e) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
-            // THIS WILL TELL YOU THE REAL ERROR IN YOUR CONSOLE
-            System.out.println("\tX DATABASE ERROR: " + e.getMessage());
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { }
             throw new DatabaseException("Failed to automate transaction: " + e.getMessage());
         }
     }

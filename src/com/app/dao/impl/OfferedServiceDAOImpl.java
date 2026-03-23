@@ -64,16 +64,63 @@ public class OfferedServiceDAOImpl implements OfferedServiceDAO {
 
     @Override
     public OfferedService getServiceById(int serviceId) {
-        return null; // TODO: Implement later
+        OfferedService service = null;
+        // Note: Ensure 'service_name' and 'price' match your XAMPP columns for this table
+        String sql = "SELECT * FROM tblofferedservices WHERE service_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, serviceId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                service = new OfferedService();
+                service.setServiceId(rs.getInt("service_id"));
+                // Mapping DB 'service_name' to Model 'serviceType'
+                service.setServiceType(rs.getString("service_name"));
+                // Mapping DB 'price' to Model 'serviceFee'
+                service.setServiceFee(rs.getDouble("price"));
+            }
+        } catch (SQLException e) {
+            System.out.println("\tX Error: " + e.getMessage());
+        }
+        return service;
     }
 
     @Override
     public boolean updateService(OfferedService service) {
-        return false; // TODO: Implement later
+        String sql = "UPDATE tblofferedservices SET service_name = ?, price = ? WHERE service_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, service.getServiceType());
+            stmt.setDouble(2, service.getServiceFee());
+            stmt.setInt(3, service.getServiceId());
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            System.out.println("\tX Update Error: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public boolean deleteService(int serviceId) {
-        return false; // TODO: Implement later
+        String sql = "DELETE FROM tblofferedservices WHERE service_id = ?";
+
+        try (Connection conn = DbConnection.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, serviceId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("\tX Cannot delete: Service is likely linked to existing appointments.");
+            return false;
+        }
     }
 }

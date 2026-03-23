@@ -4,15 +4,12 @@ import com.app.model.Appointment;
 import com.app.model.OfferedService;
 import com.app.model.User;
 import com.app.model.Pet;
-import com.app.model.Transaction; // <-- NEW: Imported Transaction Model
 import com.app.service.AppointmentService;
 import com.app.service.OfferedServiceService;
 import com.app.service.PetService;
-import com.app.service.TransactionService; // <-- NEW: Imported Transaction Service
 import com.app.service.impl.AppointmentServiceImpl;
 import com.app.service.impl.OfferedServiceServiceImpl;
 import com.app.service.impl.PetServiceImpl;
-import com.app.service.impl.TransactionServiceImpl; // <-- NEW: Imported Transaction Impl
 import com.app.util.InputUtil;
 import com.app.exception.DatabaseException;
 import java.sql.Date;
@@ -24,9 +21,6 @@ public class AppointmentView {
     private final AppointmentService appointmentService = new AppointmentServiceImpl();
     private final OfferedServiceService offeredServiceService = new OfferedServiceServiceImpl();
     private final PetService petService = new PetServiceImpl();
-
-    // --- NEW: We bring the Transaction tools into the Appointment View! ---
-    private final TransactionService transactionService = new TransactionServiceImpl();
 
     public void customerMenu(User user) {
         while (true) {
@@ -96,7 +90,7 @@ public class AppointmentView {
             }
 
             for (Pet pet : myPets) {
-                System.out.println("\t[" + pet.getPetId() + "] " + pet.getPetName());
+                System.out.println("\t[" + pet.getPetId() + "] " + pet.getPetName()); // Changed getPetId to getPetID based on common naming, adjust if needed
             }
             System.out.println("\t--------------------------");
 
@@ -104,15 +98,6 @@ public class AppointmentView {
             int serviceId = InputUtil.getInt("\tEnter Service ID: ");
             String dateStr = InputUtil.getString("\tDate (YYYY-MM-DD): ");
             String timeStr = InputUtil.getString("\tTime (HH:MM): ");
-
-            // --- NEW LOGIC: Find the exact price of the service they chose ---
-            double servicePrice = 0.0;
-            for (OfferedService service : services) {
-                if (service.getServiceId() == serviceId) {
-                    servicePrice = service.getServiceFee();
-                    break;
-                }
-            }
 
             Appointment newAppointment = new Appointment();
             newAppointment.setPetID(petId);
@@ -139,31 +124,13 @@ public class AppointmentView {
                 return;
             }
 
-            // 1. Save the Appointment
+            // 1. Save the Appointment (This triggers the Triple Save inside DAO automatically!)
             appointmentService.insertAppointment(newAppointment);
+
+            // 2. Display success messages
             System.out.println("\t-> Appointment booked successfully! Pending admin approval.");
-
-            // ==========================================
-            // NEW LOGIC: AUTOMATIC BILLING GENERATION
-            // ==========================================
-            Transaction autoBill = new Transaction();
-            autoBill.setUserId(user.getUserId());
-            autoBill.setServiceId(serviceId);
-            autoBill.setProcedureId(1); // Assuming '1' is a valid default ID for "Consultation/Booking"
-            autoBill.setMedicineId(0);  // 0 means no medicine attached yet
-            autoBill.setQuantity(1);
-            autoBill.setTotalAmount(servicePrice);
-            autoBill.setIsPaid(0); // Set to 0 so it shows up as "Pending" in their billing menu!
-
-            // Check your Transaction.java model to ensure setter names match (e.g., setUserId vs setUserID)
-
-            boolean billSuccess = transactionService.addTransaction(autoBill);
-
-            if (billSuccess) {
-                System.out.println("\t-> A pending bill of Php " + servicePrice + " has been added to your account.");
-                System.out.println("\t-> You can pay for this in advance through the 'Billing & Transactions' menu.");
-            }
-            // ==========================================
+            System.out.println("\t-> A pending bill has been added to your account.");
+            System.out.println("\t-> You can pay for this in advance through the 'Billing & Transactions' menu.");
 
         } catch (DatabaseException e) {
             System.out.println("\tX Error booking appointment: " + e.getMessage());

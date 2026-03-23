@@ -30,7 +30,7 @@ public class PetView {
             switch (choice) {
                 case 1: addPet(user); break;
                 case 2: viewPets(user); break;
-                case 3: updatePet(); break;
+                case 3: updatePet(user); break;
                 case 4: deletePet(); break;
                 case 5: return;
                 default: System.out.println("\tX Invalid choice.");
@@ -85,30 +85,42 @@ public class PetView {
     }
 
     // UPDATE PET
-    private void updatePet() {
+    private void updatePet(User user) {
         int petId = InputUtil.getInt("\tEnter Pet ID to update: ");
 
-        // We need to fetch the existing pet first
-        Pet pet = petService.getPetById(petId);
+        // 1. Search the database for the pet
+        Pet petToUpdate = petService.getPetById(petId);
 
-        if (pet == null) {
+        if (petToUpdate == null) {
             System.out.println("\tX Pet not found.");
-            return;
+            return; // This is what happened when you typed 9!
         }
 
-        pet.setPetName(InputUtil.getNonEmptyString("\tNew Name: "));
-        pet.setAnimalType(InputUtil.getNonEmptyString("\tNew Type: "));
-        pet.setBreed(InputUtil.getNonEmptyString("\tNew Breed: "));
-        pet.setAge(InputUtil.getInt("\tNew Age: "));
-        pet.setGender(InputUtil.getNonEmptyString("\tNew Gender: "));
-        pet.setWeightKg(InputUtil.getInt("\tNew Weight: "));
+        // 2. If it gets here (like when you typed 7), we ask for the new details!
+        System.out.println("\n\t--- Enter New Details for " + petToUpdate.getPetName() + " ---");
 
-        boolean success = petService.updatePet(pet);
+        String newName = InputUtil.getString("\tNew Name: ");
+        String newType = InputUtil.getString("\tNew Type (e.g., Dog/Cat): ");
+        String newBreed = InputUtil.getString("\tNew Breed: ");
+        int newAge = InputUtil.getInt("\tNew Age: ");
+        String newGender = InputUtil.getString("\tNew Gender: ");
+        int newWeight = InputUtil.getInt("\tNew Weight (kg): ");
+
+        // 3. Apply the changes to the object
+        petToUpdate.setPetName(newName);
+        petToUpdate.setAnimalType(newType);
+        petToUpdate.setBreed(newBreed);
+        petToUpdate.setAge(newAge);
+        petToUpdate.setGender(newGender);
+        petToUpdate.setWeightKg(newWeight);
+
+        // 4. Send the updated object back to the database
+        boolean success = petService.updatePet(petToUpdate);
 
         if (success) {
             System.out.println("\t-> Pet updated successfully!");
         } else {
-            System.out.println("\tX Failed to update pet.");
+            System.out.println("\tX Failed to update pet. Please check database connection.");
         }
     }
 
